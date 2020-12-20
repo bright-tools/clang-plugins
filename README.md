@@ -19,7 +19,12 @@ make
 ## Testing:
 
 ```
-clang-10 -fplugin=lib/libinclude-pack-checker-plugin.so files.c -Xclang -plugin-arg-include-path-checker -Xclang -disallow-parent-dir-include-references
+make test
+```
+
+To manually execute a plug-in, a command such as the following can be used:
+```
+clang-10 -c -fplugin=lib/libinclude-pack-checker-plugin.so files.c -Xclang -plugin-arg-include-path-checker -Xclang -disallow-parent-dir-include-references
 ```
 
 ## Packaging (.deb)
