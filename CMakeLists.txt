@@ -25,7 +25,7 @@ include(AddLLVM)
 
 # clang
 
-find_package(Clang REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG HINTS ${CLANG_DIR})
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 message(STATUS "clang found in: ${CLANG_INSTALL_PREFIX}")

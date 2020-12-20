@@ -16,7 +16,7 @@ addons:
 script:
   - mkdir build
   - cd build
-  - LLVM_DIR=/usr/lib/llvm-10 CC=clang-10 CXX=clang++-10 cmake -G "Unix Makefiles"  ..
+  - CLANG_DIR=/usr/lib/llvm-10/lib/cmake/clang LLVM_DIR=/usr/lib/llvm-10 CC=clang-10 CXX=clang++-10 cmake -G "Unix Makefiles"  ..
   - make
   - ctest --debug
   - cpack
