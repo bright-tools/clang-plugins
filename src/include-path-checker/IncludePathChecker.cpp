@@ -1,3 +1,5 @@
+/* Copyright 2020 John Bailey */
+
 #include <clang/AST/AST.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
