@@ -1,15 +1,16 @@
-language: cpp
+os: linux
 dist: bionic
+language: cpp
 
 addons:
   apt:
     update: true
-  packages:
-    - clang-10
-    - clang-10-dev
-    - llvm-10
-    - llvm-10-dev
-    - cmake
+    packages:
+      - clang-10
+      - clang-10-dev
+      - llvm-10
+      - llvm-10-dev
+      - cmake
 
 script:
   - mkdir build
