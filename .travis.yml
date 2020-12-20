@@ -16,7 +16,7 @@ addons:
 script:
   - mkdir build
   - cd build
-  - cmake -G "Unix Makefiles"  ..
+  - CC=clang-10 CXX=clang++-10 cmake -G "Unix Makefiles"  ..
   - make
   - ctest --debug
   - cpack
