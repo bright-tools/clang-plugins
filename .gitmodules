@@ -4,3 +4,6 @@
 [submodule "submodules/bats-support"]
 	path = submodules/bats-support
 	url = https://github.com/ztombol/bats-support.git
+[submodule "submodules/bats-core"]
+	path = submodules/bats-core
+	url = https://github.com/bats-core/bats-core.git
