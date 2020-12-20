@@ -1,8 +1,8 @@
-project(clang-plugins)
+project(brighttools-clang-plugins)
 cmake_minimum_required(VERSION 2.8)
 
-set(PACKAGE_NAME clang-plugins)
-set(PACKAGE_VERSION 0.1)
+set(PACKAGE_NAME brighttools-clang-plugins)
+set(PACKAGE_VERSION 0.1.1)
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 set(PACKAGE_BUGREPORT "dev@brightsilence.org")
 
@@ -12,6 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+set(CMAKE_DOCUMENT_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # LLVM
 
@@ -29,3 +30,13 @@ add_definitions(${LLVM_DEFINITIONS})
 message(STATUS "clang found in: ${CLANG_INSTALL_PREFIX}")
 
 add_subdirectory(src)
+add_subdirectory(doc)
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PACKAGE_BUGREPORT})
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/bright-tools/clang-plugins")
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Additional plugins & checkers for clang")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "clang-10")
+set(CPACK_DEBIAN_PACKAGE_VERSION ${PACKAGE_VERSION})
+include(CPack)
