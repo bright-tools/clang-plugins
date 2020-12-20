@@ -6,7 +6,6 @@
 #include <clang/Lex/PPCallbacks.h>
 
 using namespace clang;
-using namespace ento;
 
 namespace {
 
