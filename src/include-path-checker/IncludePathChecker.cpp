@@ -10,9 +10,11 @@ namespace {
 
 class CheckIncludePath : public clang::PPCallbacks {
     CompilerInstance &CI;
+    bool disallowParentDirRefs;
 
   public:
-    CheckIncludePath(CompilerInstance &CI) : clang::PPCallbacks(), CI(CI) {
+    CheckIncludePath(CompilerInstance &CI, bool disallowParentDirRefs)
+        : clang::PPCallbacks(), CI(CI), disallowParentDirRefs(disallowParentDirRefs) {
     }
 
     virtual void InclusionDirective(clang::SourceLocation HashLoc, const clang::Token &IncludeTok,
@@ -22,18 +24,22 @@ class CheckIncludePath : public clang::PPCallbacks {
                                     clang::StringRef RelativePath, const clang::Module *Imported,
                                     clang::SrcMgr::CharacteristicKind FileType) {
 
-        if (FileName.find("../") != clang::StringRef::npos) {
-            DiagnosticsEngine &diagEngine = CI.getDiagnostics();
-            const unsigned DiagID = diagEngine.getCustomDiagID(
-                DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
-            diagEngine.Report(HashLoc, DiagID) << FileName.str();
+        if (disallowParentDirRefs) {
+            const bool hasParentDirRef = (FileName.find("../") != clang::StringRef::npos) ||
+                                         (FileName.find("..\\") != clang::StringRef::npos);
+            if (hasParentDirRef) {
+                DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+                const unsigned DiagID = diagEngine.getCustomDiagID(
+                    DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
+                diagEngine.Report(HashLoc, DiagID) << FileName.str();
+            }
         }
     }
 };
 
 class IncludePathCheckerAction : public clang::PluginASTAction {
   public:
-    IncludePathCheckerAction() {
+    IncludePathCheckerAction() : disallowParentDirRefs(false) {
     }
 
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &ci,
@@ -43,12 +49,18 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
 
     bool BeginSourceFileAction(CompilerInstance &CI) override {
         clang::Preprocessor &preprocessor = CI.getPreprocessor();
-        preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI));
+        preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI, disallowParentDirRefs));
         return true;
     }
 
     bool ParseArgs(const clang::CompilerInstance &ci,
                    const std::vector<std::string> &args) override {
+
+        for (unsigned i = 0, e = args.size(); i != e; ++i) {
+            if (args[i] == "-disallow-parent-dir-include-references") {
+                disallowParentDirRefs = true;
+            }
+        }
         return true;
     }
 
@@ -56,6 +68,9 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
     clang::PluginASTAction::ActionType getActionType() override {
         return ReplaceAction;
     }
+
+  private:
+    bool disallowParentDirRefs;
 };
 
 }; // namespace
