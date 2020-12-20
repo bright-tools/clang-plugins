@@ -1,6 +1,6 @@
 # clang-plugins
 
-[![Build Status](https://travis-ci.org/bright-tools/clang-plugins.svg?branch=main)](https://travis-ci.org/bright-tools/clang-plugins)
+[![Build Status](https://travis-ci.com/bright-tools/clang-plugins.svg?branch=main)](https://travis-ci.com/bright-tools/clang-plugins)
 
 Custom Plugins for clang
 
