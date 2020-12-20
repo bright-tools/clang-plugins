@@ -16,5 +16,5 @@ script:
   - cd build
   - cmake -G "Unix Makefiles"  ..
   - make
-  - make test
+  - ctest --debug
   - cpack
