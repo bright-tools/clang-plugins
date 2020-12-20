@@ -17,7 +17,7 @@ set(CMAKE_DOCUMENT_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # LLVM
 
-find_package(LLVM REQUIRED CONFIG HINTS ${LLVM_DIR})
+find_package(LLVM 10 REQUIRED CONFIG HINTS ${LLVM_DIR})
 message(STATUS "LLVM version: ${LLVM_PACKAGE_VERSION}")
 message(STATUS "LLVMConfig.cmake found in: ${LLVM_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
@@ -25,7 +25,7 @@ include(AddLLVM)
 
 # clang
 
-find_package(Clang REQUIRED CONFIG HINTS ${CLANG_DIR})
+find_package(Clang REQUIRED CONFIG HINTS ${LLVM_INSTALL_PREFIX}/lib/cmake/clang)
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 message(STATUS "clang found in: ${CLANG_INSTALL_PREFIX}")
