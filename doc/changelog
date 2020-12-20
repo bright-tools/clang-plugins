@@ -1,6 +1,6 @@
 brighttools-clang-plugins (0.1.1) unstable; urgency=low
 
   [ John Bailey ]
-  * Handle empty minimum versions when in
+  * Initial version
 
   -- John Bailey <dev@brightsilence.org>  Sun, 20 Dec 2020 15:47:00 +0000
