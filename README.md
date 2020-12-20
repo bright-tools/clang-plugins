@@ -16,8 +16,15 @@ cmake -G "Unix Makefiles"  ..
 make
 ```
 
-Testing:
+# Testing:
 
 ```
 clang-10 -fplugin=lib/libinclude-pack-checker-plugin.so ../../plugin/clang-plugins-demo/test/files.c
+```
+
+# Packaging (.deb)
+
+```
+make
+cpack
 ```
