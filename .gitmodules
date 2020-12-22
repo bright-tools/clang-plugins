@@ -7,3 +7,6 @@
 [submodule "submodules/bats-core"]
 	path = submodules/bats-core
 	url = https://github.com/bats-core/bats-core.git
+[submodule "submodules/bats-file"]
+	path = submodules/bats-file
+	url = https://github.com/ztombol/bats-file.git
