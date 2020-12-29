@@ -18,8 +18,6 @@
 #include <clang/AST/AST.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
-#include <clang/Lex/PPCallbacks.h>
-#include <llvm/Support/MemoryBuffer.h>
 
 #include "BanPPTokensConfig.hpp"
 
@@ -31,35 +29,64 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
   public:
     PrintFunctionsConsumer(clang::CompilerInstance &Instance,
                            std::shared_ptr<BanPPTokensConfig> cfg)
-        : CCI(Instance), config(cfg) {
+        : CI(Instance), config(cfg) {
         addPreProcessorHook();
     }
 
   private:
-    const clang::CompilerInstance &CCI;
+    const clang::CompilerInstance &CI;
     std::shared_ptr<BanPPTokensConfig> config;
 
+    void checkLocation(const clang::Token &tok, clang::SourceLocation origLocation, clang::SourceLocation currentLocation) {
+        const clang::SourceManager &sm = CI.getSourceManager();
+
+        const bool isCurrentLocationMacro = currentLocation.isMacroID();
+
+        if (isCurrentLocationMacro) {
+            currentLocation = sm.getExpansionLoc(currentLocation);
+        }
+
+        const clang::StringRef tokenString = getTokenString(currentLocation);
+
+        if (isCurrentLocationMacro) {
+            checkMacro(tokenString, origLocation);
+        }
+
+        raiseErrorsIfTokenBanned(tokenString, origLocation);
+    }
+
+    clang::StringRef getTokenString(clang::SourceLocation currentLocation) {
+        const clang::SourceManager &sm = CI.getSourceManager();
+        const clang::LangOptions &LO = CI.getLangOpts();
+        auto cr = clang::Lexer::getAsCharRange(currentLocation, sm, LO);
+        return clang::Lexer::getSourceText(cr, sm, LO);
+    }
+
+    void checkMacro(const clang::StringRef& token, clang::SourceLocation origLocation) {
+        const clang::Preprocessor& pp = CI.getPreprocessor();
+        const clang::IdentifierInfo* const ii = pp.getIdentifierInfo(token);
+        const clang::MacroInfo* const mi = pp.getMacroInfo(ii);
+        for(auto macroToken = mi->tokens_begin(); macroToken != mi->tokens_end(); macroToken++) {
+            checkLocation(*macroToken, origLocation, macroToken->getLocation());
+        }
+    }
+
+    void raiseErrorsIfTokenBanned(const clang::StringRef& token, clang::SourceLocation location) {
+        for (auto bannedToken : config->bannedTokens) {
+
+            if (token == bannedToken) {
+                clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+                const unsigned diagID = diagEngine.getCustomDiagID(
+                    clang::DiagnosticsEngine::Error, "Found use of banned token '%0'");
+                diagEngine.Report(location, diagID) << bannedToken;
+            }
+        }
+    }
+
     void addPreProcessorHook() {
-        CCI.getPreprocessor().setTokenWatcher([this](const clang::Token &tok) {
-            clang::SourceLocation sl = tok.getLocation();
-            const clang::SourceManager &sm = CCI.getSourceManager();
-
-            if (sl.isMacroID()) {
-                sl = sm.getFileLoc(sl);
-            }
-
-            const clang::LangOptions &LO = CCI.getLangOpts();
-            auto cr = clang::Lexer::getAsCharRange(sl, sm, LO);
-            auto tokenString = clang::Lexer::getSourceText(cr, sm, LO);
-
-            for (auto bannedToken : config->bannedTokens) {
-                if (tokenString == bannedToken) {
-                    clang::DiagnosticsEngine &diagEngine = CCI.getDiagnostics();
-                    const unsigned diagID = diagEngine.getCustomDiagID(
-                        clang::DiagnosticsEngine::Error, "Found use of banned token '%0'");
-                    diagEngine.Report(sl, diagID) << tokenString;
-                }
-            }
+        CI.getPreprocessor().setTokenWatcher([this](const clang::Token &tok) {
+            const clang::SourceLocation sl = tok.getLocation();
+            checkLocation(tok, sl, sl);
         });
     }
 };
