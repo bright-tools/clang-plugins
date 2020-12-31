@@ -34,6 +34,9 @@ include_directories(SYSTEM ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 message(STATUS "clang found in: ${CLANG_INSTALL_PREFIX}")
 
+set(CLANG_EXE clang-${CLANG_VERSION})
+set(BATS_EXE ${PROJECT_SOURCE_DIR}/submodules/bats-core/bin/bats)
+
 add_subdirectory(src)
 add_subdirectory(doc)
 
