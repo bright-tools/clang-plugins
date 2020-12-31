@@ -13,6 +13,8 @@
    limitations under the License.
 */
 
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Path.h>
 #include <llvm/Support/YAMLTraits.h>
 
 #include "BanPPTokensConfig.hpp"
@@ -34,16 +36,22 @@ template <> struct MappingTraits<brighttools::BanPPTokensConfig> {
 
 namespace brighttools {
 
-std::shared_ptr<BanPPTokensConfig> BanPPTokensConfig::readConfig() {
-    auto config = std::make_shared<BanPPTokensConfig>();
+llvm::Optional<BanPPTokensConfig> BanPPTokensConfig::readConfig(llvm::StringRef file) {
+    auto document = llvm::MemoryBuffer::getFile(file);
 
-    auto document = llvm::MemoryBuffer::getFile(".ban-pp-tokens.yml");
+    if (!document.getError()) {
+        BanPPTokensConfig *config = new BanPPTokensConfig();
 
-    llvm::yaml::Input yin((*document)->getBuffer());
-    yin >> *config;
-    // TODO: Add error checking
+        llvm::yaml::Input yin((*document)->getBuffer());
+        yin >> *config;
 
-    return config;
+        if (!yin.error()) {
+            return llvm::Optional<BanPPTokensConfig>::create(config);
+        }
+        delete (config);
+    }
+
+    return llvm::None;
 }
 
 } // namespace brighttools

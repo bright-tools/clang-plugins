@@ -1,13 +1,13 @@
 #if !defined(BAN_PP_TOKENS_CONFIG_HPP)
 #define BAN_PP_TOKENS_CONFIG_HPP
 
-#include <llvm/Support/YAMLParser.h>
+#include "ConfigBase.hpp"
 
 namespace brighttools {
 
 class BanPPTokensConfig {
   public:
-    static std::shared_ptr<BanPPTokensConfig> readConfig();
+    static llvm::Optional<BanPPTokensConfig> readConfig(llvm::StringRef file);
 
     std::vector<std::string> bannedTokens;
 };

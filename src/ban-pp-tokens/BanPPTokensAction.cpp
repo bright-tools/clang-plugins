@@ -37,7 +37,8 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
     const clang::CompilerInstance &CI;
     std::shared_ptr<BanPPTokensConfig> config;
 
-    void checkLocation(const clang::Token &tok, clang::SourceLocation origLocation, clang::SourceLocation currentLocation) {
+    void checkLocation(const clang::Token &tok, clang::SourceLocation origLocation,
+                       clang::SourceLocation currentLocation) {
         const clang::SourceManager &sm = CI.getSourceManager();
 
         const bool isCurrentLocationMacro = currentLocation.isMacroID();
@@ -62,16 +63,16 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
         return clang::Lexer::getSourceText(cr, sm, LO);
     }
 
-    void checkMacro(const clang::StringRef& token, clang::SourceLocation origLocation) {
-        const clang::Preprocessor& pp = CI.getPreprocessor();
-        const clang::IdentifierInfo* const ii = pp.getIdentifierInfo(token);
-        const clang::MacroInfo* const mi = pp.getMacroInfo(ii);
-        for(auto macroToken = mi->tokens_begin(); macroToken != mi->tokens_end(); macroToken++) {
+    void checkMacro(const clang::StringRef &token, clang::SourceLocation origLocation) {
+        const clang::Preprocessor &pp = CI.getPreprocessor();
+        const clang::IdentifierInfo *const ii = pp.getIdentifierInfo(token);
+        const clang::MacroInfo *const mi = pp.getMacroInfo(ii);
+        for (auto macroToken = mi->tokens_begin(); macroToken != mi->tokens_end(); macroToken++) {
             checkLocation(*macroToken, origLocation, macroToken->getLocation());
         }
     }
 
-    void raiseErrorsIfTokenBanned(const clang::StringRef& token, clang::SourceLocation location) {
+    void raiseErrorsIfTokenBanned(const clang::StringRef &token, clang::SourceLocation location) {
         for (auto bannedToken : config->bannedTokens) {
 
             if (token == bannedToken) {
@@ -102,7 +103,11 @@ class BanPPTokensAction : public clang::PluginASTAction {
     bool ParseArgs(const clang::CompilerInstance &CI,
                    const std::vector<std::string> &args) override {
 
-        config = BanPPTokensConfig::readConfig();
+        llvm::Optional<BanPPTokensConfig> loadedConfig = findConfigInDirectoryHeirachy<BanPPTokensConfig>(".ban-pp-tokens.yml");
+        if (!loadedConfig) {
+            return false;
+        }
+        config = std::make_shared<BanPPTokensConfig>(*loadedConfig);
         return true;
     }
 
@@ -118,5 +123,5 @@ class BanPPTokensAction : public clang::PluginASTAction {
 }; // namespace
 
 static clang::FrontendPluginRegistry::Add<BanPPTokensAction>
-    PLUGIN_REGISTRATION("include-path-checker",
-                        "Identifies where paths have been used in include directives");
+    PLUGIN_REGISTRATION("ban-pp-tokens",
+                        "Check for (and raise an error upon) banned tokens being found");
