@@ -6,7 +6,7 @@
 
 namespace brighttools {
 
-template<class T> llvm::Optional<T> findConfigInDirectoryHeirachy(llvm::StringRef fileName) {
+template <class T> llvm::Optional<T> findConfigInDirectoryHeirachy(llvm::StringRef fileName) {
     llvm::Optional<T> config = llvm::None;
 
     llvm::SmallString<128> cwd;
@@ -15,7 +15,7 @@ template<class T> llvm::Optional<T> findConfigInDirectoryHeirachy(llvm::StringRe
 
     llvm::StringRef Path = cwd;
     for (llvm::StringRef CurrentPath = Path; !CurrentPath.empty() && !config.hasValue();
-        CurrentPath = llvm::sys::path::parent_path(CurrentPath)) {
+         CurrentPath = llvm::sys::path::parent_path(CurrentPath)) {
         llvm::SmallString<128> configFile(CurrentPath);
         llvm::sys::path::append(configFile, fileName);
         config = T::readConfig(configFile);

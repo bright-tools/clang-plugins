@@ -103,7 +103,8 @@ class BanPPTokensAction : public clang::PluginASTAction {
     bool ParseArgs(const clang::CompilerInstance &CI,
                    const std::vector<std::string> &args) override {
 
-        llvm::Optional<BanPPTokensConfig> loadedConfig = findConfigInDirectoryHeirachy<BanPPTokensConfig>(".ban-pp-tokens.yml");
+        llvm::Optional<BanPPTokensConfig> loadedConfig =
+            findConfigInDirectoryHeirachy<BanPPTokensConfig>(".ban-pp-tokens.yml");
         if (!loadedConfig) {
             return false;
         }
