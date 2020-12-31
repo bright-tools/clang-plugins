@@ -18,5 +18,5 @@ script:
   - cd build
   - LLVM_DIR=/usr/lib/llvm-10 CC=clang-10 CXX=clang++-10 cmake -G "Unix Makefiles"  ..
   - make
-  - ctest -V
+  - make test
   - cpack
