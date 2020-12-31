@@ -7,6 +7,8 @@ Custom Plugins for clang
 | Plugin | Purpose |
 |--------|---------|
 | include-path-checker-plugin | Check for (and raise an error upon) instances of paths being used in include directives (e.g. `#include "../something/file.h"` ) |
+| ban-pp-tokens-plugin | Check for (and raise an error upon) banned tokens being found during source lexing.  This means that an error will be raised for banned tokens even if they do not actually end up being used. |
+| ban-token-update-plugin | Check for (and rais an error upon) banned tokens being utilised.  In constast to _ban-pp-tokens-plugin_, banned tokens may exist within the source files so long as they are not referenced. |
 
 ## Building
 
@@ -27,6 +29,10 @@ make test
 To manually execute a plug-in, a command such as the following can be used:
 ```
 clang-10 -c -fplugin=lib/libinclude-path-checker-plugin.so files.c -Xclang -plugin-arg-include-path-checker -Xclang -disallow-parent-dir-include-references
+```
+
+```
+clang-10 -fsyntax-only -fplugin=lib/libban-pp-token-usage-plugin.so files.c -Xclang -analyze -Xclang -analyzer-checker=brighttools.ban-token-usage
 ```
 
 ## Packaging (.deb)
