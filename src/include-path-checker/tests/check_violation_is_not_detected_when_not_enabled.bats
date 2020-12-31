@@ -13,7 +13,7 @@ function teardown() {
 }
 
 @test "Check that a violation of the check is not detected when the check is not enabled" {
-    run clang-10 -c -fplugin=${PLUGIN_TARGET} includes_via_parent_path.c -o ${COMPILER_OUTPUT}
+    run ${CLANG_EXE} -c -fplugin=${PLUGIN_TARGET} includes_via_parent_path.c -o ${COMPILER_OUTPUT}
     assert_success
     # Check that the file actually got compiled
     assert_file_exist ${COMPILER_OUTPUT}
