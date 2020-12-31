@@ -1,4 +1,4 @@
-add_library(brighttools-clang-plugin-util MODULE
+add_library(brighttools-clang-plugin-util STATIC
   ConfigBase.cpp
 )
 
