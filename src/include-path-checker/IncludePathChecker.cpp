@@ -65,7 +65,6 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
         bool shouldInstallHook = false;
 
         for (unsigned i = 0, e = args.size(); i != e; ++i) {
-            llvm::outs() << args[i];
             if (args[i] == "-disallow-parent-dir-include-references") {
                 disallowParentDirRefs = true;
                 shouldInstallHook = true;
