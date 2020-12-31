@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/bright-tools/clang-plugins.svg?branch=main)](https://travis-ci.com/bright-tools/clang-plugins)
 
-Custom Plugins for clang
+Custom Plugins for [clang](https://clang.llvm.org/)
 
 | Plugin | Purpose |
 |--------|---------|
