@@ -12,7 +12,7 @@ Custom Plugins for [clang](https://clang.llvm.org/)
 
 ## Building
 
-```
+```bash
 git clone https://github.com/bright-tools/clang-plugins.git
 cd clang-plugins
 mkdir build && cd build
@@ -22,22 +22,22 @@ make
 
 ## Testing:
 
-```
+```bash
 make test
 ```
 
 To manually execute a plug-in, a command such as the following can be used:
-```
+```bash
 clang-10 -c -fplugin=lib/libinclude-path-checker-plugin.so files.c -Xclang -plugin-arg-include-path-checker -Xclang -disallow-parent-dir-include-references
 ```
 
-```
+```bash
 clang-10 -fsyntax-only -fplugin=lib/libban-pp-token-usage-plugin.so files.c -Xclang -analyze -Xclang -analyzer-checker=brighttools.ban-token-usage
 ```
 
 ## Packaging (.deb)
 
-```
+```bash
 make
 cpack
 ```
