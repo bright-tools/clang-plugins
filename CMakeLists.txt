@@ -2,7 +2,7 @@ project(brighttools-clang-plugins)
 cmake_minimum_required(VERSION 2.8)
 enable_testing()
 
-set(CLANG_VERSION 10)
+set(CLANG_VERSION 11)
 set(PACKAGE_NAME brighttools-clang-plugins-${CLANG_VERSION})
 set(PACKAGE_VERSION 0.1.1)
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
