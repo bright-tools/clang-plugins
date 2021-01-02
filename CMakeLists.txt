@@ -35,7 +35,10 @@ add_definitions(${LLVM_DEFINITIONS})
 message(STATUS "clang found in: ${CLANG_INSTALL_PREFIX}")
 
 set(CLANG_EXE clang-${CLANG_VERSION})
-set(BATS_EXE ${PROJECT_SOURCE_DIR}/submodules/bats-core/bin/bats)
+set(SUBMODULES_ROOT ${PROJECT_SOURCE_DIR}/submodules)
+set(BATS_EXE ${SUBMODULES_ROOT}/bats-core/bin/bats)
+
+set(TEST_ENVIRONMENT "SUBMODULES_ROOT=${SUBMODULES_ROOT};CLANG_EXE=${CLANG_EXE}")
 
 add_subdirectory(src)
 add_subdirectory(doc)

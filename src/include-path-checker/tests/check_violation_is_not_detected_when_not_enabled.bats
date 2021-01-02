@@ -1,6 +1,6 @@
-source ../../../submodules/bats-support/load.bash
-source ../../../submodules/bats-assert/load.bash
-source ../../../submodules/bats-file/load.bash
+source ${SUBMODULES_ROOT}/bats-support/load.bash
+source ${SUBMODULES_ROOT}/bats-assert/load.bash
+source ${SUBMODULES_ROOT}/bats-file/load.bash
 
 COMPILER_OUTPUT=includes_via_parent_path.o
 
