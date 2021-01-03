@@ -17,7 +17,7 @@
 #include <llvm/Support/Path.h>
 #include <llvm/Support/YAMLTraits.h>
 
-#include "BanPPTokensConfig.hpp"
+#include "BanTokenConfig.hpp"
 
 using namespace llvm;
 using namespace yaml;
@@ -25,8 +25,8 @@ using namespace yaml;
 namespace llvm {
 namespace yaml {
 
-template <> struct MappingTraits<brighttools::BanPPTokensConfig> {
-    static void mapping(IO &io, brighttools::BanPPTokensConfig &info) {
+template <> struct MappingTraits<brighttools::BanTokenConfig> {
+    static void mapping(IO &io, brighttools::BanTokenConfig &info) {
         io.mapRequired("BannedTokens", info.bannedTokens);
     }
 };
@@ -36,17 +36,17 @@ template <> struct MappingTraits<brighttools::BanPPTokensConfig> {
 
 namespace brighttools {
 
-llvm::Optional<BanPPTokensConfig> BanPPTokensConfig::readConfig(llvm::StringRef file) {
+llvm::Optional<BanTokenConfig> BanTokenConfig::readConfig(llvm::StringRef file) {
     auto document = llvm::MemoryBuffer::getFile(file);
 
     if (!document.getError()) {
-        BanPPTokensConfig *config = new BanPPTokensConfig();
+        BanTokenConfig *config = new BanTokenConfig();
 
         llvm::yaml::Input yin((*document)->getBuffer());
         yin >> *config;
 
         if (!yin.error()) {
-            return llvm::Optional<BanPPTokensConfig>::create(config);
+            return llvm::Optional<BanTokenConfig>::create(config);
         }
         delete (config);
     }
@@ -54,7 +54,17 @@ llvm::Optional<BanPPTokensConfig> BanPPTokensConfig::readConfig(llvm::StringRef 
     return llvm::None;
 }
 
+bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck) const {
+    for (auto bannedToken : bannedTokens) {
+
+        if (tokenToCheck == bannedToken) {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace brighttools
 
-LLVM_YAML_IS_SEQUENCE_VECTOR(brighttools::BanPPTokensConfig)
+LLVM_YAML_IS_SEQUENCE_VECTOR(brighttools::BanTokenConfig)
 LLVM_YAML_IS_SEQUENCE_VECTOR(std::vector<std::string>)

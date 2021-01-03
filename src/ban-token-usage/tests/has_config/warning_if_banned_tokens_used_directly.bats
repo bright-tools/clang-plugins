@@ -7,4 +7,7 @@ source ${SUBMODULES_ROOT}/bats-file/load.bash
     assert_success
     assert_output --partial "banned_tokens_used_directly.c:1:5: warning: Banned token 'AVOID' [brighttools.ban-token-usage]"
     assert_output --partial "banned_tokens_used_directly.c:2:9: warning: Banned token 'EVIL' [brighttools.ban-token-usage]"
+    assert_output --partial "banned_tokens_used_directly.c:6:6: warning: Banned token 'EVIL' [brighttools.ban-token-usage]"
+    assert_output --partial "banned_tokens_used_directly.c:6:15: warning: Banned token 'AVOID' [brighttools.ban-token-usage]"
+    assert_output --partial "banned_tokens_used_directly.c:7:11: warning: Banned token 'AVOID' [brighttools.ban-token-usage]"
 }

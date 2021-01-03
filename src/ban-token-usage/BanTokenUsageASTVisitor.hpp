@@ -1,24 +1,21 @@
 #if !defined BAN_PP_TOKENS_AST_VISITOR_HPP
 #define BAN_PP_TOKENS_AST_VISITOR_HPP
 
-#include <clang/AST/DeclBase.h>
-#include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/StaticAnalyzer/Core/BugReporter/BugReporter.h>
 #include <clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h>
 
-#include "BanTokenUsageConfig.hpp"
+#include "BanTokenConfig.hpp"
 
 namespace brighttools {
 
-class BanTokenUsageASTVisitor : public clang::RecursiveASTVisitor<BanTokenUsageASTVisitor> {
-  
+class BanTokenUsageASTVisitor {
+
   private:
     const clang::ento::CheckerBase &CB;
-    const BanTokenUsageConfig config;
+    const BanTokenConfig config;
 
   public:
-    explicit BanTokenUsageASTVisitor(const clang::ento::CheckerBase &CB,
-                                     BanTokenUsageConfig config);
+    explicit BanTokenUsageASTVisitor(const clang::ento::CheckerBase &CB, BanTokenConfig config);
     bool AnalyseDecl(const clang::Decl *const D, clang::ento::AnalysisManager &AM,
                      clang::ento::BugReporter &BR);
 };

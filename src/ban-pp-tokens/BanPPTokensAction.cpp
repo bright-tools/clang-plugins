@@ -19,7 +19,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 
-#include "BanPPTokensConfig.hpp"
+#include "BanTokenConfig.hpp"
 
 using namespace brighttools;
 
@@ -27,15 +27,14 @@ namespace {
 
 class PrintFunctionsConsumer : public clang::ASTConsumer {
   public:
-    PrintFunctionsConsumer(clang::CompilerInstance &Instance,
-                           std::shared_ptr<BanPPTokensConfig> cfg)
+    PrintFunctionsConsumer(clang::CompilerInstance &Instance, std::shared_ptr<BanTokenConfig> cfg)
         : CI(Instance), config(cfg) {
         addPreProcessorHook();
     }
 
   private:
     const clang::CompilerInstance &CI;
-    std::shared_ptr<BanPPTokensConfig> config;
+    std::shared_ptr<BanTokenConfig> config;
 
     void checkLocation(const clang::Token &tok, clang::SourceLocation origLocation,
                        clang::SourceLocation currentLocation) {
@@ -73,14 +72,11 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
     }
 
     void raiseErrorsIfTokenBanned(const clang::StringRef &token, clang::SourceLocation location) {
-        for (auto bannedToken : config->bannedTokens) {
-
-            if (token == bannedToken) {
-                clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
-                const unsigned diagID = diagEngine.getCustomDiagID(
-                    clang::DiagnosticsEngine::Error, "Found use of banned token '%0'");
-                diagEngine.Report(location, diagID) << bannedToken;
-            }
+        if (config->isTokenBanned(token)) {
+            clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+            const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
+                                                               "Found use of banned token '%0'");
+            diagEngine.Report(location, diagID) << token;
         }
     }
 
@@ -103,12 +99,12 @@ class BanPPTokensAction : public clang::PluginASTAction {
     bool ParseArgs(const clang::CompilerInstance &CI,
                    const std::vector<std::string> &args) override {
 
-        llvm::Optional<BanPPTokensConfig> loadedConfig =
-            findConfigInDirectoryHeirachy<BanPPTokensConfig>(".ban-pp-tokens.yml");
+        llvm::Optional<BanTokenConfig> loadedConfig =
+            findConfigInDirectoryHeirachy<BanTokenConfig>(".ban-pp-tokens.yml");
         if (!loadedConfig) {
             return false;
         }
-        config = std::make_shared<BanPPTokensConfig>(*loadedConfig);
+        config = std::make_shared<BanTokenConfig>(*loadedConfig);
         return true;
     }
 
@@ -118,7 +114,7 @@ class BanPPTokensAction : public clang::PluginASTAction {
     }
 
   private:
-    std::shared_ptr<BanPPTokensConfig> config = nullptr;
+    std::shared_ptr<BanTokenConfig> config = nullptr;
 };
 
 }; // namespace

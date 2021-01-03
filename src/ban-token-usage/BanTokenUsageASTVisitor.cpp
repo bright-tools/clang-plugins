@@ -21,7 +21,7 @@ using namespace clang;
 using namespace ento;
 using namespace brighttools;
 
-BanTokenUsageASTVisitor::BanTokenUsageASTVisitor(const CheckerBase &CB, BanTokenUsageConfig config)
+BanTokenUsageASTVisitor::BanTokenUsageASTVisitor(const CheckerBase &CB, BanTokenConfig config)
     : CB(CB), config(config) {
 }
 
@@ -40,18 +40,14 @@ bool BanTokenUsageASTVisitor::AnalyseDecl(const clang::Decl *const D,
         const CharSourceRange tokenCharRange = clang::Lexer::getAsCharRange(tokenLocation, sm, LO);
         const StringRef tokenString = clang::Lexer::getSourceText(tokenCharRange, sm, LO);
 
-        for (auto bannedToken : config.bannedTokens) {
+        if (config.isTokenBanned(tokenString)) {
 
-            if (tokenString == bannedToken) {
-                PathDiagnosticLocation *Location =
-                    new PathDiagnosticLocation(tokenLocation, BR.getSourceManager());
-                SmallString<256> S;
-                llvm::raw_svector_ostream os(S);
-                os << "Banned token '" << bannedToken << "'";
-                BR.EmitBasicReport(D, &CB, "Banned token used in code", "Banned token used in code",
-                                   os.str(), *Location, sr);
-                delete (Location);
-            }
+            PathDiagnosticLocation diagnosticLocation(tokenLocation, BR.getSourceManager());
+            SmallString<256> S;
+            llvm::raw_svector_ostream os(S);
+            os << "Banned token '" << tokenString << "'";
+            BR.EmitBasicReport(D, &CB, "Banned token used in code", "Banned token used in code",
+                               os.str(), diagnosticLocation, sr);
         }
 
         i += std::max((size_t)1, tokenString.size());
