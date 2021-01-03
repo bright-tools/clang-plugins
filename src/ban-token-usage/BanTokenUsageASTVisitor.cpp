@@ -21,66 +21,40 @@ using namespace clang;
 using namespace ento;
 using namespace brighttools;
 
-BanTokenUsageASTVisitor::BanTokenUsageASTVisitor(BugReporter &B) : BR(B) {
+BanTokenUsageASTVisitor::BanTokenUsageASTVisitor(const CheckerBase &CB, BanTokenUsageConfig config)
+    : CB(CB), config(config) {
 }
 
-bool BanTokenUsageASTVisitor::VisitDecl(clang::Decl *D) {
-    llvm::outs() << "Decl:\n";
-    D->print(llvm::outs(), 0, false);
-    llvm::outs() << "\n---\n";
-    return true;
-}
-
-bool BanTokenUsageASTVisitor::VisitType(clang::Type *T) {
-    //    T->print(llvm::outs(), 0, false);
-    llvm::outs() << "Type " << T->getTypeClassName() << "\n";
-    return true;
-}
-
-bool BanTokenUsageASTVisitor::VisitStmt(clang::Stmt *S) {
-    //    S->print(llvm::outs(), 0, false);
-    llvm::outs() << "Stmt " << S->getStmtClassName() << "\n";
-    SourceLocation sl = S->getBeginLoc();
+bool BanTokenUsageASTVisitor::AnalyseDecl(const clang::Decl *const D,
+                                          clang::ento::AnalysisManager &AM,
+                                          clang::ento::BugReporter &BR) {
+    const unsigned declStartRaw = D->getBeginLoc().getRawEncoding();
+    const unsigned declEndRaw = D->getEndLoc().getRawEncoding();
     const SourceManager &sm = BR.getSourceManager();
+    const SourceRange sr = D->getSourceRange();
     Preprocessor &pp = BR.getPreprocessor();
-    llvm::outs() << "Stmt " << sl.printToString(sm) << "\n";
-    SourceRange sr = S->getSourceRange();
-    llvm::outs() << "Stmt " << sr.printToString(sm) << "\n";
-    const LangOptions &LO = BR.getContext().getLangOpts();
+    const LangOptions &LO = pp.getLangOpts();
 
-    auto CharRange = Lexer::getAsCharRange(sr, sm, LO);
+    for (unsigned i = declStartRaw; i < declEndRaw;) {
+        const SourceLocation tokenLocation = SourceLocation::getFromRawEncoding(i);
+        const CharSourceRange tokenCharRange = clang::Lexer::getAsCharRange(tokenLocation, sm, LO);
+        const StringRef tokenString = clang::Lexer::getSourceText(tokenCharRange, sm, LO);
 
-    auto StringRep = Lexer::getSourceText(CharRange, sm, LO);
-    llvm::errs() << "StmtX:" << StringRep << "\n";
-    Token result;
-    if (!pp.getRawToken(sl, result)) {
-        llvm::outs() << "Got a token!\n";
+        for (auto bannedToken : config.bannedTokens) {
+
+            if (tokenString == bannedToken) {
+                PathDiagnosticLocation *Location =
+                    new PathDiagnosticLocation(tokenLocation, BR.getSourceManager());
+                SmallString<256> S;
+                llvm::raw_svector_ostream os(S);
+                os << "Banned token '" << bannedToken << "'";
+                BR.EmitBasicReport(D, &CB, "Banned token used in code", "Banned token used in code",
+                                   os.str(), *Location, sr);
+                delete (Location);
+            }
+        }
+
+        i += std::max((size_t)1, tokenString.size());
     }
-
-    if (sl.isMacroID()) {
-        llvm::outs() << "Is a macro!\n";
-    }
-    llvm::outs() << "------< END STMT\n";
-    return true;
-}
-
-bool BanTokenUsageASTVisitor::VisitAttr(clang::Attr *A) {
-    //    A->print(llvm::outs(), 0, false);
-    llvm::outs() << "Attr\n";
-    return true;
-}
-bool BanTokenUsageASTVisitor::VisitTypeLoc(clang::TypeLoc TL) {
-    //   TL->print(llvm::outs(), 0, false);
-    llvm::outs() << "TypeLoc\n";
-    return true;
-}
-bool BanTokenUsageASTVisitor::VisitQualifiedTypeLoc(clang::QualifiedTypeLoc TL) {
-    //    TL->print(llvm::outs(), 0, false);
-    llvm::outs() << "QalTypeLoc\n";
-    return true;
-}
-bool BanTokenUsageASTVisitor::VisitUnqualTypeLoc(clang::UnqualTypeLoc TL) {
-    //   TL->print(llvm::outs(), 0, false);
-    llvm::outs() << "UnqalTypeLoc\n";
     return true;
 }

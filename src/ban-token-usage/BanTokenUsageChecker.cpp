@@ -19,20 +19,37 @@
 #include <clang/StaticAnalyzer/Frontend/CheckerRegistry.h>
 
 #include "BanTokenUsageASTVisitor.hpp"
+#include "BanTokenUsageConfig.hpp"
 
 using namespace clang;
 using namespace ento;
+using namespace brighttools;
 
 namespace {
 
 class BanTokenUsageChecker : public Checker<check::ASTCodeBody> {
+
+  private:
+    std::shared_ptr<BanTokenUsageASTVisitor> visitor;
+
+    void loadConfig() {
+        llvm::Optional<BanTokenUsageConfig> loadedConfig =
+            findConfigInDirectoryHeirachy<BanTokenUsageConfig>(".ban-token-usage.yml");
+        if (!loadedConfig) {
+            return;
+        }
+        visitor = std::make_shared<brighttools::BanTokenUsageASTVisitor>(*this, *loadedConfig);
+    }
+
   public:
-    BanTokenUsageChecker() {
+    BanTokenUsageChecker() : visitor(nullptr) {
+        loadConfig();
     }
 
     void checkASTCodeBody(const Decl *D, AnalysisManager &AM, BugReporter &BR) const {
-        brighttools::BanTokenUsageASTVisitor visitor(BR);
-        visitor.TraverseDecl(const_cast<Decl *>(D));
+        if (visitor) {
+            visitor->AnalyseDecl(const_cast<Decl *>(D), AM, BR);
+        }
     }
 };
 
@@ -44,8 +61,6 @@ extern "C" const char clang_analyzerAPIVersionString[] = CLANG_ANALYZER_API_VERS
 
 extern "C" void clang_registerCheckers(CheckerRegistry &registry) {
     registry.addChecker<BanTokenUsageChecker>(
-        CHECKER_PLUGIN_NAME,
-        "Check for (and raise an error upon) banned pre-processor tokens being found (e.g. an "
-        "error-prone macro)",
+        CHECKER_PLUGIN_NAME, "Check for (and raise an error upon) banned tokens being found",
         "https://github.com/bright-tools/clang-plugins", false);
 }

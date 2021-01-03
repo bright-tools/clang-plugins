@@ -4,20 +4,23 @@
 #include <clang/AST/DeclBase.h>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/StaticAnalyzer/Core/BugReporter/BugReporter.h>
+#include <clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h>
+
+#include "BanTokenUsageConfig.hpp"
 
 namespace brighttools {
+
 class BanTokenUsageASTVisitor : public clang::RecursiveASTVisitor<BanTokenUsageASTVisitor> {
-    clang::ento::BugReporter &BR;
+  
+  private:
+    const clang::ento::CheckerBase &CB;
+    const BanTokenUsageConfig config;
 
   public:
-    explicit BanTokenUsageASTVisitor(clang::ento::BugReporter &B);
-    bool VisitDecl(clang::Decl *D);
-    bool VisitType(clang::Type *T);
-    bool VisitAttr(clang::Attr *A);
-    bool VisitStmt(clang::Stmt *S);
-    bool VisitTypeLoc(clang::TypeLoc TL);
-    bool VisitQualifiedTypeLoc(clang::QualifiedTypeLoc TL);
-    bool VisitUnqualTypeLoc(clang::UnqualTypeLoc TL);
+    explicit BanTokenUsageASTVisitor(const clang::ento::CheckerBase &CB,
+                                     BanTokenUsageConfig config);
+    bool AnalyseDecl(const clang::Decl *const D, clang::ento::AnalysisManager &AM,
+                     clang::ento::BugReporter &BR);
 };
 } // namespace brighttools
 
