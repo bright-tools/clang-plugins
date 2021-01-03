@@ -1,7 +1,7 @@
-add_library(include-path-checker-plugin MODULE
+add_library(include-path-checker-plugin-${CLANG_VERSION} MODULE
   IncludePathChecker.cpp
 )
 
-install(TARGETS include-path-checker-plugin DESTINATION lib)
+install(TARGETS include-path-checker-plugin-${CLANG_VERSION} DESTINATION lib)
 
 add_subdirectory(tests)

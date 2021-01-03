@@ -1,9 +1,9 @@
-add_library(ban-pp-tokens-plugin MODULE
+add_library(ban-pp-tokens-plugin-${CLANG_VERSION} MODULE
   BanPPTokensAction.cpp
 )
 
-target_link_libraries(ban-pp-tokens-plugin PRIVATE brighttools-clang-plugin-util)
+target_link_libraries(ban-pp-tokens-plugin-${CLANG_VERSION} PRIVATE brighttools-clang-plugin-util)
 
-install(TARGETS ban-pp-tokens-plugin DESTINATION lib)
+install(TARGETS ban-pp-tokens-plugin-${CLANG_VERSION} DESTINATION lib)
 
 add_subdirectory(tests)
