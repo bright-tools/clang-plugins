@@ -1,3 +1,9 @@
+brighttools-clang-plugins (0.2.1) unstable; urgency=low
+
+  * Added -disallow-child-dir-include-references option to include-path-checker
+
+  -- John Bailey <dev@brightsilence.org>  Mon, 4 Jan 2021 19:30:00 +0000
+
 brighttools-clang-plugins (0.1.1) unstable; urgency=low
 
   [ John Bailey ]

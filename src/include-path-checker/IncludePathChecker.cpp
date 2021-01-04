@@ -20,13 +20,18 @@
 
 namespace {
 
+typedef struct {
+    bool disallowParentDirRefs = false;
+    bool disallowChildDirRefs = false;
+} CheckIncludePathConfigOptions;
+
 class CheckIncludePath : public clang::PPCallbacks {
     const clang::CompilerInstance &CI;
-    bool disallowParentDirRefs;
+    const CheckIncludePathConfigOptions config;
 
   public:
-    CheckIncludePath(const clang::CompilerInstance &CI, bool disallowParentDirRefs)
-        : clang::PPCallbacks(), CI(CI), disallowParentDirRefs(disallowParentDirRefs) {
+    CheckIncludePath(const clang::CompilerInstance &CI, CheckIncludePathConfigOptions& config)
+        : clang::PPCallbacks(), CI(CI), config(config) {
     }
 
     virtual void InclusionDirective(clang::SourceLocation HashLoc, const clang::Token &IncludeTok,
@@ -36,23 +41,27 @@ class CheckIncludePath : public clang::PPCallbacks {
                                     clang::StringRef RelativePath, const clang::Module *Imported,
                                     clang::SrcMgr::CharacteristicKind FileType) {
 
-        if (disallowParentDirRefs) {
-            const bool hasParentDirRef = (FileName.find("../") != clang::StringRef::npos) ||
-                                         (FileName.find("..\\") != clang::StringRef::npos);
-            if (hasParentDirRef) {
-                clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
-                const unsigned diagID = diagEngine.getCustomDiagID(
-                    clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
-                diagEngine.Report(HashLoc, diagID) << FileName.str();
-            }
+        bool shouldReportDiagnostic = false;
+
+        if (config.disallowParentDirRefs) {
+            shouldReportDiagnostic = (FileName.find("../") != clang::StringRef::npos) ||
+                                     (FileName.find("..\\") != clang::StringRef::npos);
+        }
+        if (!shouldReportDiagnostic && config.disallowChildDirRefs) {
+           shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
+                                    (FileName.find("\\") != clang::StringRef::npos);
+        }
+        if (shouldReportDiagnostic) {
+            clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+            const unsigned diagID = diagEngine.getCustomDiagID(
+                clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
+            diagEngine.Report(HashLoc, diagID) << FileName.str();
         }
     }
 };
 
 class IncludePathCheckerAction : public clang::PluginASTAction {
   public:
-    IncludePathCheckerAction() : disallowParentDirRefs(false) {
-    }
 
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &CI,
                                                           llvm::StringRef InFile) override {
@@ -66,7 +75,10 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
 
         for (unsigned i = 0, e = args.size(); i != e; ++i) {
             if (args[i] == "-disallow-parent-dir-include-references") {
-                disallowParentDirRefs = true;
+                config.disallowParentDirRefs = true;
+                shouldInstallHook = true;
+            } else if (args[i] == "-disallow-child-dir-include-references") {
+                config.disallowChildDirRefs = true;
                 shouldInstallHook = true;
             }
         }
@@ -86,10 +98,10 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
   private:
     void addPreProcessorHook(const clang::CompilerInstance &CI) {
         clang::Preprocessor &preprocessor = CI.getPreprocessor();
-        preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI, disallowParentDirRefs));
+        preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI, config));
     }
 
-    bool disallowParentDirRefs;
+    CheckIncludePathConfigOptions config;
 };
 
 }; // namespace
