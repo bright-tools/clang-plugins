@@ -20,17 +20,15 @@
 
 namespace {
 
-typedef struct {
-    bool disallowParentDirRefs = false;
-    bool disallowChildDirRefs = false;
-} CheckIncludePathConfigOptions;
-
 class CheckIncludePath : public clang::PPCallbacks {
-    const clang::CompilerInstance &CI;
-    const CheckIncludePathConfigOptions config;
 
   public:
-    CheckIncludePath(const clang::CompilerInstance &CI, CheckIncludePathConfigOptions& config)
+    typedef struct {
+        bool disallowParentDirRefs = false;
+        bool disallowChildDirRefs = false;
+    } CheckIncludePathConfigOptions;
+
+    CheckIncludePath(const clang::CompilerInstance &CI, CheckIncludePathConfigOptions &config)
         : clang::PPCallbacks(), CI(CI), config(config) {
     }
 
@@ -48,8 +46,8 @@ class CheckIncludePath : public clang::PPCallbacks {
                                      (FileName.find("..\\") != clang::StringRef::npos);
         }
         if (!shouldReportDiagnostic && config.disallowChildDirRefs) {
-           shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
-                                    (FileName.find("\\") != clang::StringRef::npos);
+            shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
+                                     (FileName.find("\\") != clang::StringRef::npos);
         }
         if (shouldReportDiagnostic) {
             clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
@@ -58,11 +56,14 @@ class CheckIncludePath : public clang::PPCallbacks {
             diagEngine.Report(HashLoc, diagID) << FileName.str();
         }
     }
+
+  private:
+    const clang::CompilerInstance &CI;
+    const CheckIncludePathConfigOptions config;
 };
 
 class IncludePathCheckerAction : public clang::PluginASTAction {
   public:
-
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &CI,
                                                           llvm::StringRef InFile) override {
         return std::make_unique<clang::ASTConsumer>();
@@ -101,7 +102,7 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
         preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI, config));
     }
 
-    CheckIncludePathConfigOptions config;
+    CheckIncludePath::CheckIncludePathConfigOptions config;
 };
 
 }; // namespace
