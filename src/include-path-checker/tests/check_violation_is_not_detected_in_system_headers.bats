@@ -1,0 +1,7 @@
+source ${SUBMODULES_ROOT}/bats-support/load.bash
+source ${SUBMODULES_ROOT}/bats-assert/load.bash
+
+@test "Check that a violation of the check is not detected when the system headers used relative includes" {
+    run ${CLANG_EXE} -isystem include_dir -c -fplugin=${PLUGIN_TARGET} does_not_include_via_parent_path.c -Xclang -plugin-arg-include-path-checker -Xclang -disallow-parent-dir-include-references
+    assert_success
+}
