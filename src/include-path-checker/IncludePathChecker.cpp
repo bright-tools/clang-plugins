@@ -39,21 +39,28 @@ class CheckIncludePath : public clang::PPCallbacks {
                                     clang::StringRef RelativePath, const clang::Module *Imported,
                                     clang::SrcMgr::CharacteristicKind FileType) {
 
-        bool shouldReportDiagnostic = false;
+        clang::SourceManager &sm = CI.getSourceManager();
 
-        if (config.disallowParentDirRefs) {
-            shouldReportDiagnostic = (FileName.find("../") != clang::StringRef::npos) ||
-                                     (FileName.find("..\\") != clang::StringRef::npos);
-        }
-        if (!shouldReportDiagnostic && config.disallowChildDirRefs) {
-            shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
-                                     (FileName.find("\\") != clang::StringRef::npos);
-        }
-        if (shouldReportDiagnostic) {
-            clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
-            const unsigned diagID = diagEngine.getCustomDiagID(
-                clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
-            diagEngine.Report(HashLoc, diagID) << FileName.str();
+        const bool isIncludedFromSysHeader = sm.isInSystemHeader(HashLoc);
+
+        if (!isIncludedFromSysHeader) {
+
+            bool shouldReportDiagnostic = false;
+
+            if (config.disallowParentDirRefs) {
+                shouldReportDiagnostic = (FileName.find("../") != clang::StringRef::npos) ||
+                                         (FileName.find("..\\") != clang::StringRef::npos);
+            }
+            if (!shouldReportDiagnostic && config.disallowChildDirRefs) {
+                shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
+                                         (FileName.find("\\") != clang::StringRef::npos);
+            }
+            if (shouldReportDiagnostic) {
+                clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+                const unsigned diagID = diagEngine.getCustomDiagID(
+                    clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
+                diagEngine.Report(HashLoc, diagID) << FileName.str();
+            }
         }
     }
 
