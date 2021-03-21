@@ -39,13 +39,17 @@ bool BanTokenUsageASTVisitor::AnalyseDecl(const clang::Decl *const D,
         const SourceLocation tokenLocation = SourceLocation::getFromRawEncoding(i);
         const CharSourceRange tokenCharRange = clang::Lexer::getAsCharRange(tokenLocation, sm, LO);
         const StringRef tokenString = clang::Lexer::getSourceText(tokenCharRange, sm, LO);
+        std::string reason;
 
-        if (config.isTokenBanned(tokenString)) {
+        if (config.isTokenBanned(tokenString, &reason)) {
 
             PathDiagnosticLocation diagnosticLocation(tokenLocation, BR.getSourceManager());
             SmallString<256> S;
             llvm::raw_svector_ostream os(S);
             os << "Banned token '" << tokenString << "'";
+            if (reason.length()) {
+                os << " (Ban reason: " << reason << ")";
+            }
             BR.EmitBasicReport(D, &CB, "Banned token used in code", "Banned token used in code",
                                os.str(), diagnosticLocation, sr);
         }

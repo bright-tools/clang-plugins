@@ -10,7 +10,8 @@ int AVOID(void) {
     return 0;
 }
 
-void EVIL(int AVOID) {
+void EVIL(int AVOID, int BAD) {
     (void)AVOID;
+    (void)BAD;
     return;
 }

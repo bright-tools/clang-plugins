@@ -72,11 +72,20 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
     }
 
     void raiseErrorsIfTokenBanned(const clang::StringRef &token, clang::SourceLocation location) {
-        if (config->isTokenBanned(token)) {
+        std::string reason;
+        if (config->isTokenBanned(token, &reason)) {
             clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
-            const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
-                                                               "Found use of banned token '%0'");
-            diagEngine.Report(location, diagID) << token;
+            if (reason.length()) {
+                const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
+                                                                  "Found use of banned token '%0'.\nBan reason: %1");
+                diagEngine.Report(location, diagID) << token << reason;
+            }
+            else
+            {
+                const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
+                                                                  "Found use of banned token '%0'.");
+                diagEngine.Report(location, diagID) << token;
+            }
         }
     }
 

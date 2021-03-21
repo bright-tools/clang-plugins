@@ -25,9 +25,16 @@ using namespace yaml;
 namespace llvm {
 namespace yaml {
 
+template <> struct MappingTraits<brighttools::BanTokenConfig::BannedToken> {
+    static void mapping(IO &io, brighttools::BanTokenConfig::BannedToken &info) {
+        io.mapRequired("Token", info.token);
+        io.mapOptional("Reason", info.reason);
+    }
+};
+
 template <> struct MappingTraits<brighttools::BanTokenConfig> {
     static void mapping(IO &io, brighttools::BanTokenConfig &info) {
-        io.mapRequired("BannedTokens", info.bannedTokens);
+        io.mapOptional("BannedTokens", info.bannedTokens);
     }
 };
 
@@ -54,10 +61,13 @@ llvm::Optional<BanTokenConfig> BanTokenConfig::readConfig(llvm::StringRef file) 
     return llvm::None;
 }
 
-bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck) const {
+bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck, std::string* reason) const {
     for (auto bannedToken : bannedTokens) {
 
-        if (tokenToCheck == bannedToken) {
+        if (tokenToCheck == bannedToken.token) {
+            if (reason != NULL) {
+                *reason = bannedToken.reason;
+            }
             return true;
         }
     }
@@ -67,4 +77,4 @@ bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck) const {
 } // namespace brighttools
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(brighttools::BanTokenConfig)
-LLVM_YAML_IS_SEQUENCE_VECTOR(std::vector<std::string>)
+LLVM_YAML_IS_SEQUENCE_VECTOR(brighttools::BanTokenConfig::BannedToken)

@@ -1,5 +1,8 @@
 BannedTokens:
-  - EVIL
-  - BAD
-  - AVOID
-  - FAKE
+  - Token: EVIL
+    Reason: It's evil
+  - Token: BAD
+  - Token: AVOID
+    Reason: Should be avoided
+  - Token: Fake
+    Reason: It's fake

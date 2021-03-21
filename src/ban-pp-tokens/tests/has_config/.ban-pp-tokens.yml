@@ -1,4 +1,6 @@
 BannedTokens:
-  - EVIL
-  - BAD
-  - AVOID
+  - Token: EVIL
+    Reason: It's evil
+  - Token: BAD
+  - Token: AVOID
+    Reason: It should be avoided

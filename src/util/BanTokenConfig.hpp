@@ -7,11 +7,16 @@ namespace brighttools {
 
 class BanTokenConfig {
   public:
+    typedef struct {
+      std::string token;
+      std::string reason;
+    } BannedToken;
+
     static llvm::Optional<BanTokenConfig> readConfig(llvm::StringRef file);
 
-    bool isTokenBanned(const llvm::StringRef tokenToCheck) const;
+    bool isTokenBanned(const llvm::StringRef tokenToCheck, std::string* reason = NULL) const;
 
-    std::vector<std::string> bannedTokens;
+    std::vector<BannedToken> bannedTokens;
 };
 
 } // namespace brighttools

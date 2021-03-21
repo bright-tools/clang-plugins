@@ -8,6 +8,8 @@ source ${SUBMODULES_ROOT}/bats-file/load.bash
     run ${CLANG_EXE} -c -fplugin=${PLUGIN_TARGET} banned_tokens_unused.c -o ${output_file}
     assert_failure
     assert_output --partial "banned_tokens_unused.c:3:12: error: Found use of banned token 'EVIL'"
+    assert_output --partial "Ban reason: It's evil"
+    assert_output --partial "banned_tokens_unused.c:5:20: error: Found use of banned token 'BAD'"
     assert_output --partial "banned_tokens_unused.c:5:20: error: Found use of banned token 'BAD'"
     assert_file_not_exist ${output_file}
 }
