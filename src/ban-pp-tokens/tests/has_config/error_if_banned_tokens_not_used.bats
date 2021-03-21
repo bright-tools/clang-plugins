@@ -10,6 +10,5 @@ source ${SUBMODULES_ROOT}/bats-file/load.bash
     assert_output --partial "banned_tokens_unused.c:3:12: error: Found use of banned token 'EVIL'"
     assert_output --partial "Ban reason: It's evil"
     assert_output --partial "banned_tokens_unused.c:5:20: error: Found use of banned token 'BAD'"
-    assert_output --partial "banned_tokens_unused.c:5:20: error: Found use of banned token 'BAD'"
     assert_file_not_exist ${output_file}
 }
