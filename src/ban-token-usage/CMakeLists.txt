@@ -1,10 +1,10 @@
-add_library(ban-token-usage-plugin-${CLANG_VERSION} MODULE
+add_library(ban-token-usage-plugin-${CLANG_VERSION_MAJOR} MODULE
   BanTokenUsageChecker.cpp
   BanTokenUsageASTVisitor.cpp
 )
 
-target_link_libraries(ban-token-usage-plugin-${CLANG_VERSION} PRIVATE brighttools-clang-plugin-util)
+target_link_libraries(ban-token-usage-plugin-${CLANG_VERSION_MAJOR} PRIVATE brighttools-clang-plugin-util)
 
-install(TARGETS ban-token-usage-plugin-${CLANG_VERSION} DESTINATION lib)
+install(TARGETS ban-token-usage-plugin-${CLANG_VERSION_MAJOR} DESTINATION lib)
 
 add_subdirectory(tests)

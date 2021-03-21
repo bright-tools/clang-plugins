@@ -28,7 +28,7 @@ make test
 
 To manually execute a plug-in, a command such as the following can be used:
 ```bash
-clang-11 -c -fplugin=lib/libinclude-path-checker-plugin.so files.c -Xclang -plugin-arg-include-path-checker -Xclang -disallow-parent-dir-include-references
+clang-11 -c -fplugin=lib/libinclude-path-checker-plugin.so files.c -Xclang -plugin-arg-include-path-checker
 ```
 
 ```bash
