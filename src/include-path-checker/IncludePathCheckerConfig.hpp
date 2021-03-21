@@ -1,0 +1,18 @@
+#if !defined(INCLUDE_PATH_CHECKER_CONFIG_HPP)
+#define INCLUDE_PATH_CHECKER_CONFIG_HPP
+
+#include "ConfigBase.hpp"
+
+namespace brighttools {
+
+class IncludePathCheckerConfig {
+  public:
+    static llvm::Optional<IncludePathCheckerConfig> readConfig(llvm::StringRef file);
+
+    bool disallowParentDirIncludeReferences;
+    bool disallowChildDirIncludeReferences;
+};
+
+} // namespace brighttools
+
+#endif // INCLUDE_PATH_CHECKER_CONFIG_HPP

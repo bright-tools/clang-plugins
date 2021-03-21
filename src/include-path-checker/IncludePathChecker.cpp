@@ -13,22 +13,21 @@
    limitations under the License.
 */
 
+#include "IncludePathCheckerConfig.hpp"
+
 #include <clang/AST/AST.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 #include <clang/Lex/PPCallbacks.h>
+
+using namespace brighttools;
 
 namespace {
 
 class CheckIncludePath : public clang::PPCallbacks {
 
   public:
-    typedef struct {
-        bool disallowParentDirRefs = false;
-        bool disallowChildDirRefs = false;
-    } CheckIncludePathConfigOptions;
-
-    CheckIncludePath(const clang::CompilerInstance &CI, CheckIncludePathConfigOptions &config)
+    CheckIncludePath(const clang::CompilerInstance &CI, IncludePathCheckerConfig &config)
         : clang::PPCallbacks(), CI(CI), config(config) {
     }
 
@@ -47,11 +46,11 @@ class CheckIncludePath : public clang::PPCallbacks {
 
             bool shouldReportDiagnostic = false;
 
-            if (config.disallowParentDirRefs) {
+            if (config.disallowParentDirIncludeReferences) {
                 shouldReportDiagnostic = (FileName.find("../") != clang::StringRef::npos) ||
                                          (FileName.find("..\\") != clang::StringRef::npos);
             }
-            if (!shouldReportDiagnostic && config.disallowChildDirRefs) {
+            if (!shouldReportDiagnostic && config.disallowChildDirIncludeReferences) {
                 shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
                                          (FileName.find("\\") != clang::StringRef::npos);
             }
@@ -66,7 +65,7 @@ class CheckIncludePath : public clang::PPCallbacks {
 
   private:
     const clang::CompilerInstance &CI;
-    const CheckIncludePathConfigOptions config;
+    const IncludePathCheckerConfig config;
 };
 
 class IncludePathCheckerAction : public clang::PluginASTAction {
@@ -79,22 +78,12 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
     bool ParseArgs(const clang::CompilerInstance &CI,
                    const std::vector<std::string> &args) override {
 
-        bool shouldInstallHook = false;
-
-        for (unsigned i = 0, e = args.size(); i != e; ++i) {
-            if (args[i] == "-disallow-parent-dir-include-references") {
-                config.disallowParentDirRefs = true;
-                shouldInstallHook = true;
-            } else if (args[i] == "-disallow-child-dir-include-references") {
-                config.disallowChildDirRefs = true;
-                shouldInstallHook = true;
-            }
+        llvm::Optional<IncludePathCheckerConfig> loadedConfig =
+            findConfigInDirectoryHeirachy<IncludePathCheckerConfig>(".include-path-checker.yml");
+        if (!loadedConfig) {
+            return true;
         }
-
-        if (shouldInstallHook) {
-            addPreProcessorHook(CI);
-        }
-
+        addPreProcessorHook(CI, *loadedConfig);
         return true;
     }
 
@@ -104,12 +93,11 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
     }
 
   private:
-    void addPreProcessorHook(const clang::CompilerInstance &CI) {
+
+    void addPreProcessorHook(const clang::CompilerInstance &CI, IncludePathCheckerConfig config) {
         clang::Preprocessor &preprocessor = CI.getPreprocessor();
         preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI, config));
     }
-
-    CheckIncludePath::CheckIncludePathConfigOptions config;
 };
 
 }; // namespace
