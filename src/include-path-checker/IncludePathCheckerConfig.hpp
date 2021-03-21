@@ -11,6 +11,7 @@ class IncludePathCheckerConfig {
 
     bool disallowParentDirIncludeReferences;
     bool disallowChildDirIncludeReferences;
+    bool allowChildDirSystemHeaderIncludeReferences;
 };
 
 } // namespace brighttools

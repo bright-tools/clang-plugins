@@ -53,6 +53,12 @@ class CheckIncludePath : public clang::PPCallbacks {
             if (!shouldReportDiagnostic && config.disallowChildDirIncludeReferences) {
                 shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
                                          (FileName.find("\\") != clang::StringRef::npos);
+
+                const bool isSystemHeader = (clang::SrcMgr::CharacteristicKind::C_System == FileType) || (clang::SrcMgr::CharacteristicKind::C_ExternCSystem  == FileType);
+
+                 if (isSystemHeader && config.allowChildDirSystemHeaderIncludeReferences) {
+                     shouldReportDiagnostic = false;
+                 }
             }
             if (shouldReportDiagnostic) {
                 clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();

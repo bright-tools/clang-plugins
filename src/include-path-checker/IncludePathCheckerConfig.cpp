@@ -27,8 +27,9 @@ namespace yaml {
 
 template <> struct MappingTraits<brighttools::IncludePathCheckerConfig> {
     static void mapping(IO &io, brighttools::IncludePathCheckerConfig &info) {
-        io.mapRequired("DisallowParentDirIncludeReferences", info.disallowParentDirIncludeReferences);
-        io.mapRequired("DisallowChildDirIncludeReferences", info.disallowChildDirIncludeReferences);
+        io.mapOptional("DisallowParentDirIncludeReferences", info.disallowParentDirIncludeReferences);
+        io.mapOptional("DisallowChildDirIncludeReferences", info.disallowChildDirIncludeReferences);
+        io.mapOptional("AllowChildDirSystemHeaderIncludeReferences", info.allowChildDirSystemHeaderIncludeReferences);
     }
 };
 

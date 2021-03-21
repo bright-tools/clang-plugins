@@ -10,6 +10,10 @@ add_test(NAME IncludePathChecker_PositiveChild
          COMMAND ${BATS_EXE} check_child_path_violation_is_detected.bats
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/disallow_child)
 
+add_test(NAME IncludePathChecker_PositiveSystemChild
+         COMMAND ${BATS_EXE} check_child_system_path_violation_is_detected.bats
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/disallow_child)
+
 add_test(NAME IncludePathChecker_PositiveChildAndParent
          COMMAND ${BATS_EXE} check_child_and_parent_path_violations_are_detected.bats
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/disallow_child_and_parent)
@@ -26,4 +30,9 @@ add_test(NAME IncludePathChecker_SystemHeaderExclusion
          COMMAND ${BATS_EXE} check_violation_is_not_detected_in_system_headers.bats
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/disallow_child_and_parent)
 
-set_tests_properties(IncludePathChecker_SystemHeaderExclusion IncludePathChecker_PositiveParentIndirect IncludePathChecker_PositiveChildAndParent IncludePathChecker_PositiveChild IncludePathChecker_PositiveParent IncludePathChecker_NotEnabled IncludePathChecker_Negative PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT};PLUGIN_TARGET=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/$<TARGET_FILE_NAME:include-path-checker-plugin-${CLANG_VERSION}>")
+add_test(NAME IncludePathChecker_ChildSystemHeaderAllowed
+         COMMAND ${BATS_EXE} check_violation_is_not_detected_when_system_child_refs_allowed.bats
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/disallow_child_allow_system)
+
+
+set_tests_properties(IncludePathChecker_ChildSystemHeaderAllowed IncludePathChecker_PositiveSystemChild IncludePathChecker_SystemHeaderExclusion IncludePathChecker_PositiveParentIndirect IncludePathChecker_PositiveChildAndParent IncludePathChecker_PositiveChild IncludePathChecker_PositiveParent IncludePathChecker_NotEnabled IncludePathChecker_Negative PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT};PLUGIN_TARGET=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/$<TARGET_FILE_NAME:include-path-checker-plugin-${CLANG_VERSION}>")
