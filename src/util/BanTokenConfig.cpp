@@ -16,6 +16,7 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Path.h>
 #include <llvm/Support/YAMLTraits.h>
+#include <llvm/Support/Regex.h>
 
 #include "BanTokenConfig.hpp"
 
@@ -29,6 +30,7 @@ template <> struct MappingTraits<brighttools::BanTokenConfig::BannedToken> {
     static void mapping(IO &io, brighttools::BanTokenConfig::BannedToken &info) {
         io.mapRequired("Token", info.token);
         io.mapOptional("Reason", info.reason);
+        io.mapOptional("WhiteListRegex", info.whitelistRegex);
     }
 };
 
@@ -61,14 +63,17 @@ llvm::Optional<BanTokenConfig> BanTokenConfig::readConfig(llvm::StringRef file) 
     return llvm::None;
 }
 
-bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck, std::string* reason) const {
+bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck, const std::string fileName, std::string* const reason) const {
     for (auto bannedToken : bannedTokens) {
 
         if (tokenToCheck == bannedToken.token) {
-            if (reason != NULL) {
-                *reason = bannedToken.reason;
+            llvm::Regex* const whilelistRegex = new llvm::Regex(bannedToken.whitelistRegex);
+            if (!whilelistRegex->match(fileName)) {
+                if (reason != NULL) {
+                    *reason = bannedToken.reason;
+                }
+                return true;
             }
-            return true;
         }
     }
     return false;

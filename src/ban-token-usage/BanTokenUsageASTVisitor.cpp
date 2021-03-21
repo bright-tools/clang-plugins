@@ -39,9 +39,10 @@ bool BanTokenUsageASTVisitor::AnalyseDecl(const clang::Decl *const D,
         const SourceLocation tokenLocation = SourceLocation::getFromRawEncoding(i);
         const CharSourceRange tokenCharRange = clang::Lexer::getAsCharRange(tokenLocation, sm, LO);
         const StringRef tokenString = clang::Lexer::getSourceText(tokenCharRange, sm, LO);
+        const std::string fileName = sm.getFilename(tokenLocation).str();
         std::string reason;
 
-        if (config.isTokenBanned(tokenString, &reason)) {
+        if (config.isTokenBanned(tokenString, fileName, &reason)) {
 
             PathDiagnosticLocation diagnosticLocation(tokenLocation, BR.getSourceManager());
             SmallString<256> S;

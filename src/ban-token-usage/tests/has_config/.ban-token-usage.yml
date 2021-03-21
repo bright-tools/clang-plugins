@@ -4,5 +4,6 @@ BannedTokens:
   - Token: BAD
   - Token: AVOID
     Reason: Should be avoided
+    WhiteListRegex: .*whitelist.*
   - Token: Fake
     Reason: It's fake

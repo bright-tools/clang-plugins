@@ -8,4 +8,8 @@ add_test(NAME BanTokenUsage_TokensPresentUsedDirectly
          COMMAND ${BATS_EXE} warning_if_banned_tokens_used_directly.bats
          WORKING_DIRECTORY ${TEST_DIR})
 
-set_tests_properties(BanTokenUsage_TokensPresentNotUsed BanTokenUsage_TokensPresentUsedDirectly PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT}")
+add_test(NAME BanTokenUsage_WhitelistedTokens
+         COMMAND ${BATS_EXE} no_warning_if_banned_tokens_whitelisted.bats
+         WORKING_DIRECTORY ${TEST_DIR})
+
+set_tests_properties(BanTokenUsage_WhitelistedTokens BanTokenUsage_TokensPresentNotUsed BanTokenUsage_TokensPresentUsedDirectly PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT}")

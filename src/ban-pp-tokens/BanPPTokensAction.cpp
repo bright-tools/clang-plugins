@@ -73,7 +73,10 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
 
     void raiseErrorsIfTokenBanned(const clang::StringRef &token, clang::SourceLocation location) {
         std::string reason;
-        if (config->isTokenBanned(token, &reason)) {
+        const clang::SourceManager &sm = CI.getSourceManager();
+        const std::string fileName = sm.getFilename(location).str();
+
+        if (config->isTokenBanned(token, fileName, &reason)) {
             clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
             if (reason.length()) {
                 const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,

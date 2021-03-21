@@ -4,3 +4,4 @@ BannedTokens:
   - Token: BAD
   - Token: AVOID
     Reason: It should be avoided
+    WhiteListRegex: .*whitelist.*

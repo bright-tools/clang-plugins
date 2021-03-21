@@ -10,11 +10,12 @@ class BanTokenConfig {
     typedef struct {
       std::string token;
       std::string reason;
+      std::string whitelistRegex;
     } BannedToken;
 
     static llvm::Optional<BanTokenConfig> readConfig(llvm::StringRef file);
 
-    bool isTokenBanned(const llvm::StringRef tokenToCheck, std::string* reason = NULL) const;
+    bool isTokenBanned(const llvm::StringRef tokenToCheck, const std::string fileName, std::string* const reason = NULL) const;
 
     std::vector<BannedToken> bannedTokens;
 };
