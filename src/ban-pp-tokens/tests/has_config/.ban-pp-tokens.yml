@@ -2,6 +2,7 @@ BannedTokens:
   - Token: EVIL
     Reason: It's evil
   - Token: BAD
+    WhiteListRegex: .*header_whitelist.h
   - Token: AVOID
     Reason: It should be avoided
     WhiteListRegex: .*whitelist.*

@@ -12,5 +12,8 @@ add_test(NAME BanPPTokens_TokensPresentUsedDirectly
          COMMAND ${BATS_EXE} no_error_if_banned_tokens_whitelisted.bats
          WORKING_DIRECTORY ${BAN_PP_TOKENS_HAS_CONFIG_TEST_DIR})
 
+add_test(NAME BanPPTokens_WhitelistedTokensUsedIndirectly
+         COMMAND ${BATS_EXE} no_error_if_indirect_banned_tokens_whitelisted.bats
+         WORKING_DIRECTORY ${BAN_PP_TOKENS_HAS_CONFIG_TEST_DIR})
 
-set_tests_properties(BanPPTokens_WhitelistedTokens BanPPTokens_TokensPresentNotUsed BanPPTokens_TokensPresentUsedDirectly PROPERTIES ENVIRONMENT "${BAN_PP_TOKENS_TEST_ENVIRONMENT}")
+set_tests_properties(BanPPTokens_WhitelistedTokensUsedIndirectly BanPPTokens_WhitelistedTokens BanPPTokens_TokensPresentNotUsed BanPPTokens_TokensPresentUsedDirectly PROPERTIES ENVIRONMENT "${BAN_PP_TOKENS_TEST_ENVIRONMENT}")

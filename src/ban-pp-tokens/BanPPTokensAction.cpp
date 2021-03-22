@@ -49,10 +49,10 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
         const clang::StringRef tokenString = getTokenString(currentLocation);
 
         if (isCurrentLocationMacro) {
-            checkMacro(tokenString, origLocation);
+            checkMacro(tokenString, currentLocation);
         }
 
-        raiseErrorsIfTokenBanned(tokenString, origLocation);
+        raiseErrorsIfTokenBanned(tokenString, currentLocation);
     }
 
     clang::StringRef getTokenString(clang::SourceLocation currentLocation) {

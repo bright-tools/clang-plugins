@@ -1,3 +1,17 @@
+brighttools-clang-plugins (0.3.0) unstable; urgency=low
+
+  * Fix whitelisting bug in ban-pp-tokens
+
+  -- John Bailey <dev@brightsilence.org>  Mon, 22 Mar 2021 00:30:00 +0000
+
+brighttools-clang-plugins (0.3.0) unstable; urgency=low
+
+  * Update include-path-checker to utilise a config file rather than command line options
+  * Update token ban plugins to allow a reason for the ban to be specified in the configuration
+  * Update token ban plugins to allow a file whitelist to be specified
+
+  -- John Bailey <dev@brightsilence.org>  Mon, 21 Mar 2021 19:30:00 +0000
+
 brighttools-clang-plugins (0.2.0) unstable; urgency=low
 
   * Added -disallow-child-dir-include-references option to include-path-checker
