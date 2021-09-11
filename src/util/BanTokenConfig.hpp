@@ -11,6 +11,7 @@ class BanTokenConfig {
       std::string token;
       std::string reason;
       std::string whitelistRegex;
+      std::string blacklistRegex;
     } BannedToken;
 
     static llvm::Optional<BanTokenConfig> readConfig(llvm::StringRef file);
