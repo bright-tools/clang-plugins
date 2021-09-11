@@ -31,6 +31,7 @@ template <> struct MappingTraits<brighttools::BanTokenConfig::BannedToken> {
         io.mapRequired("Token", info.token);
         io.mapOptional("Reason", info.reason);
         io.mapOptional("WhiteListRegex", info.whitelistRegex);
+        io.mapOptional("BlackListRegex", info.blacklistRegex);
     }
 };
 
@@ -67,8 +68,22 @@ bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck, const std
     for (auto bannedToken : bannedTokens) {
 
         if (tokenToCheck == bannedToken.token) {
-            llvm::Regex* const whilelistRegex = new llvm::Regex(bannedToken.whitelistRegex);
-            if (!whilelistRegex->match(fileName)) {
+
+            /* All files are blacklisted by default, unless the blacklist regex is specified
+               in which case only files matched by that expression are blacklisted */
+            bool isBlacklisted = true;
+            if (!bannedToken.blacklistRegex.empty()) {
+                llvm::Regex* const blacklistRegex = new llvm::Regex(bannedToken.blacklistRegex);
+                isBlacklisted = blacklistRegex->match(fileName);
+            }
+
+            bool isWhitelisted = false;
+            if (!bannedToken.whitelistRegex.empty()) {
+                llvm::Regex* const whilelistRegex = new llvm::Regex(bannedToken.whitelistRegex);
+                isWhitelisted = whilelistRegex->match(fileName);
+            }
+
+            if (isBlacklisted && !isWhitelisted) {
                 if (reason != NULL) {
                     *reason = bannedToken.reason;
                 }

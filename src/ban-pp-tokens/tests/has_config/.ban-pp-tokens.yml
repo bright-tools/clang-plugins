@@ -6,3 +6,7 @@ BannedTokens:
   - Token: AVOID
     Reason: It should be avoided
     WhiteListRegex: .*whitelist.*
+  - Token: BLACKLISTED
+    Reason: It's not going to help you
+    WhiteListRegex: has_banned_token_is_blacklisted_and_whitelisted\.c
+    BlackListRegex: (has_banned_token_and_is_blacklisted|has_banned_token_is_blacklisted_and_whitelisted)\.c

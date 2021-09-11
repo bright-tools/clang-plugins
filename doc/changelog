@@ -1,3 +1,9 @@
+brighttools-clang-plugins (0.4.0) unstable; urgency=low
+
+  * Add Blacklist configuration option
+
+  -- John Bailey <dev@brightsilence.org>  Sat, 11 Sep 2021 11:00:00 +0000
+
 brighttools-clang-plugins (0.3.0) unstable; urgency=low
 
   * Fix whitelisting bug in ban-pp-tokens
