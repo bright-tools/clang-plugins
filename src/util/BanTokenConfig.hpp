@@ -3,6 +3,8 @@
 
 #include "ConfigBase.hpp"
 
+#include <llvm/Support/Regex.h>
+
 namespace brighttools {
 
 class BanTokenConfig {
@@ -10,8 +12,10 @@ class BanTokenConfig {
     typedef struct {
       std::string token;
       std::string reason;
-      std::string whitelistRegex;
-      std::string blacklistRegex;
+      std::string whitelistRegexString;
+      std::shared_ptr<llvm::Regex> whitelistRegex;
+      std::string blacklistRegexString;
+      std::shared_ptr<llvm::Regex> blacklistRegex;
     } BannedToken;
 
     static llvm::Optional<BanTokenConfig> readConfig(llvm::StringRef file);
@@ -19,6 +23,8 @@ class BanTokenConfig {
     bool isTokenBanned(const llvm::StringRef tokenToCheck, const std::string fileName, std::string* const reason = NULL) const;
 
     std::vector<BannedToken> bannedTokens;
+  private:
+    static void populateRegexCache(BanTokenConfig* const config);
 };
 
 } // namespace brighttools
