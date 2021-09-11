@@ -30,8 +30,8 @@ template <> struct MappingTraits<brighttools::BanTokenConfig::BannedToken> {
     static void mapping(IO &io, brighttools::BanTokenConfig::BannedToken &info) {
         io.mapRequired("Token", info.token);
         io.mapOptional("Reason", info.reason);
-        io.mapOptional("WhiteListRegex", info.whitelistRegex);
-        io.mapOptional("BlackListRegex", info.blacklistRegex);
+        io.mapOptional("WhiteListRegex", info.whitelistRegexString);
+        io.mapOptional("BlackListRegex", info.blacklistRegexString);
     }
 };
 
@@ -46,6 +46,19 @@ template <> struct MappingTraits<brighttools::BanTokenConfig> {
 
 namespace brighttools {
 
+void BanTokenConfig::populateRegexCache(BanTokenConfig* const config) {
+    for (std::vector<BannedToken>::iterator it = config->bannedTokens.begin();
+         it != config->bannedTokens.end();
+         it++) {
+        if (!(it->blacklistRegexString.empty())) {
+            it->blacklistRegex = std::shared_ptr<llvm::Regex>(new llvm::Regex(it->blacklistRegexString));
+        }
+        if (!(it->whitelistRegexString.empty())) {
+            it->whitelistRegex = std::shared_ptr<llvm::Regex>(new llvm::Regex(it->whitelistRegexString));
+        }
+    }
+}
+
 llvm::Optional<BanTokenConfig> BanTokenConfig::readConfig(llvm::StringRef file) {
     auto document = llvm::MemoryBuffer::getFile(file);
 
@@ -56,6 +69,7 @@ llvm::Optional<BanTokenConfig> BanTokenConfig::readConfig(llvm::StringRef file) 
         yin >> *config;
 
         if (!yin.error()) {
+            populateRegexCache(config);
             return llvm::Optional<BanTokenConfig>::create(config);
         }
         delete (config);
@@ -65,27 +79,25 @@ llvm::Optional<BanTokenConfig> BanTokenConfig::readConfig(llvm::StringRef file) 
 }
 
 bool BanTokenConfig::isTokenBanned(const llvm::StringRef tokenToCheck, const std::string fileName, std::string* const reason) const {
-    for (auto bannedToken : bannedTokens) {
+    for (auto bannedToken = bannedTokens.begin(); bannedToken != bannedTokens.end(); bannedToken++) {
 
-        if (tokenToCheck == bannedToken.token) {
+        if (tokenToCheck == bannedToken->token) {
 
             /* All files are blacklisted by default, unless the blacklist regex is specified
                in which case only files matched by that expression are blacklisted */
             bool isBlacklisted = true;
-            if (!bannedToken.blacklistRegex.empty()) {
-                llvm::Regex* const blacklistRegex = new llvm::Regex(bannedToken.blacklistRegex);
-                isBlacklisted = blacklistRegex->match(fileName);
+            if (bannedToken->blacklistRegex) {
+                isBlacklisted = bannedToken->blacklistRegex->match(fileName);
             }
 
             bool isWhitelisted = false;
-            if (!bannedToken.whitelistRegex.empty()) {
-                llvm::Regex* const whilelistRegex = new llvm::Regex(bannedToken.whitelistRegex);
-                isWhitelisted = whilelistRegex->match(fileName);
+            if (bannedToken->whitelistRegex) {
+                isWhitelisted = bannedToken->whitelistRegex->match(fileName);
             }
 
             if (isBlacklisted && !isWhitelisted) {
                 if (reason != NULL) {
-                    *reason = bannedToken.reason;
+                    *reason = bannedToken->reason;
                 }
                 return true;
             }

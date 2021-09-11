@@ -1,6 +1,7 @@
 brighttools-clang-plugins (0.4.0) unstable; urgency=low
 
   * Add Blacklist configuration option
+  * Optimise isTokenBanned runtime performance by pre-building required regexes 
 
   -- John Bailey <dev@brightsilence.org>  Sat, 11 Sep 2021 11:00:00 +0000
 
