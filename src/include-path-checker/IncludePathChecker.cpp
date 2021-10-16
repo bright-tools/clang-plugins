@@ -71,7 +71,6 @@ class CheckIncludePath : public clang::PPCallbacks {
 
             std::string reason;
             if(config.bannedFiles.isStringBanned(FileName, File->getName().data(), &reason)) {
-                clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
                 if (reason.empty()) {
                     diagEngine.Report(HashLoc, bannedIncludeDiagId) << FileName.str();
                 } else {
