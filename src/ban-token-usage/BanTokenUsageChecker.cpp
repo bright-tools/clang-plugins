@@ -18,7 +18,7 @@
 #include <clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h>
 #include <clang/StaticAnalyzer/Frontend/CheckerRegistry.h>
 
-#include "BanTokenConfig.hpp"
+#include "BanStringConfig.hpp"
 #include "BanTokenUsageASTVisitor.hpp"
 
 using namespace clang;
@@ -33,8 +33,8 @@ class BanTokenUsageChecker : public Checker<check::ASTCodeBody> {
     std::shared_ptr<BanTokenUsageASTVisitor> visitor;
 
     void loadConfig() {
-        llvm::Optional<BanTokenConfig> loadedConfig =
-            findConfigInDirectoryHeirachy<BanTokenConfig>(".ban-token-usage.yml");
+        llvm::Optional<BanStringConfig> loadedConfig =
+            findConfigInDirectoryHeirachy<BanStringConfig>(".ban-token-usage.yml");
         if (!loadedConfig) {
             return;
         }

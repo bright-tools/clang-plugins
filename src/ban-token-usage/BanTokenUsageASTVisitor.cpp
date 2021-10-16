@@ -21,7 +21,7 @@ using namespace clang;
 using namespace ento;
 using namespace brighttools;
 
-BanTokenUsageASTVisitor::BanTokenUsageASTVisitor(const CheckerBase &CB, BanTokenConfig config)
+BanTokenUsageASTVisitor::BanTokenUsageASTVisitor(const CheckerBase &CB, BanStringConfig config)
     : CB(CB), config(config) {
 }
 
@@ -42,7 +42,7 @@ bool BanTokenUsageASTVisitor::AnalyseDecl(const clang::Decl *const D,
         const std::string fileName = sm.getFilename(tokenLocation).str();
         std::string reason;
 
-        if (config.isTokenBanned(tokenString, fileName, &reason)) {
+        if (config.isStringBanned(tokenString, fileName, &reason)) {
 
             PathDiagnosticLocation diagnosticLocation(tokenLocation, BR.getSourceManager());
             SmallString<256> S;

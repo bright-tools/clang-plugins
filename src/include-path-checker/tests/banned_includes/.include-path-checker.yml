@@ -1,0 +1,4 @@
+BannedIncludes:
+  - Filename: include_file_which_includes_another_include.h
+    Reason: It's a test
+  - Filename: include_file.h

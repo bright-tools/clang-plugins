@@ -2,6 +2,7 @@
 #define INCLUDE_PATH_CHECKER_CONFIG_HPP
 
 #include "ConfigBase.hpp"
+#include "BanStringConfig.hpp"
 
 namespace brighttools {
 
@@ -12,6 +13,7 @@ class IncludePathCheckerConfig {
     bool disallowParentDirIncludeReferences;
     bool disallowChildDirIncludeReferences;
     bool allowChildDirSystemHeaderIncludeReferences;
+    BanStringConfig bannedFiles;
 };
 
 } // namespace brighttools

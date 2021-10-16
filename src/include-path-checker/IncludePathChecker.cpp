@@ -19,6 +19,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 #include <clang/Lex/PPCallbacks.h>
+#include <clang/Basic/FileManager.h>
 
 using namespace brighttools;
 
@@ -29,6 +30,7 @@ class CheckIncludePath : public clang::PPCallbacks {
   public:
     CheckIncludePath(const clang::CompilerInstance &CI, IncludePathCheckerConfig &config)
         : clang::PPCallbacks(), CI(CI), config(config) {
+        initialiseDiagnosticIds();
     }
 
     virtual void InclusionDirective(clang::SourceLocation HashLoc, const clang::Token &IncludeTok,
@@ -60,18 +62,41 @@ class CheckIncludePath : public clang::PPCallbacks {
                      shouldReportDiagnostic = false;
                  }
             }
+
+            clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+
             if (shouldReportDiagnostic) {
+                diagEngine.Report(HashLoc, foundRelativePathDiagId) << FileName.str();
+            }
+
+            std::string reason;
+            if(config.bannedFiles.isStringBanned(FileName, File->getName().data(), &reason)) {
                 clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
-                const unsigned diagID = diagEngine.getCustomDiagID(
-                    clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
-                diagEngine.Report(HashLoc, diagID) << FileName.str();
+                if (reason.empty()) {
+                    diagEngine.Report(HashLoc, bannedIncludeDiagId) << FileName.str();
+                } else {
+                    diagEngine.Report(HashLoc, bannedIncludeWithReasonDiagId) << FileName.str() << reason;
+                }
             }
         }
     }
 
   private:
     const clang::CompilerInstance &CI;
-    const IncludePathCheckerConfig config;
+    IncludePathCheckerConfig config;
+    unsigned foundRelativePathDiagId;
+    unsigned bannedIncludeDiagId;
+    unsigned bannedIncludeWithReasonDiagId;
+
+    void initialiseDiagnosticIds() {
+        clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
+        foundRelativePathDiagId = diagEngine.getCustomDiagID(
+            clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
+        bannedIncludeDiagId = diagEngine.getCustomDiagID(
+            clang::DiagnosticsEngine::Error, "Found use of banned include '%0'");
+        bannedIncludeWithReasonDiagId = diagEngine.getCustomDiagID(
+            clang::DiagnosticsEngine::Error, "Found use of banned include '%0', ban reason: %1");
+    }
 };
 
 class IncludePathCheckerAction : public clang::PluginASTAction {
