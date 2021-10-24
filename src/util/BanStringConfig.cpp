@@ -74,13 +74,11 @@ bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const 
                in which case only files matched by that expression are blacklisted */
             bool isBlacklisted = true;
             if (bannedString->blacklistRegex) {
-                llvm::outs() << "BLCheck\n";
                 isBlacklisted = bannedString->blacklistRegex->match(fileName);
             }
 
             bool isWhitelisted = false;
             if (bannedString->whitelistRegex) {
-                llvm::outs() << "WLCheck\n" << fileName << "\n";
                 isWhitelisted = bannedString->whitelistRegex->match(fileName);
             }
 
