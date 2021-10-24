@@ -27,9 +27,12 @@ namespace yaml {
 
 template <> struct MappingTraits<brighttools::IncludePathCheckerConfig> {
     static void mapping(IO &io, brighttools::IncludePathCheckerConfig &info) {
+        brighttools::BannedStringContext *context = reinterpret_cast<brighttools::BannedStringContext *>(io.getContext());
+
         io.mapOptional("DisallowParentDirIncludeReferences", info.disallowParentDirIncludeReferences);
         io.mapOptional("DisallowChildDirIncludeReferences", info.disallowChildDirIncludeReferences);
         io.mapOptional("AllowChildDirSystemHeaderIncludeReferences", info.allowChildDirSystemHeaderIncludeReferences);
+        io.mapOptionalWithContext("BannedIncludes", info.bannedFiles.bannedStrings, *context);
     }
 };
 
@@ -44,7 +47,8 @@ llvm::Optional<IncludePathCheckerConfig> IncludePathCheckerConfig::readConfig(ll
     if (!document.getError()) {
         IncludePathCheckerConfig *config = new IncludePathCheckerConfig();
 
-        llvm::yaml::Input yin((*document)->getBuffer());
+        BannedStringContext context = {.stringAlias = "Filename"};
+        llvm::yaml::Input yin((*document)->getBuffer(), &context);
         yin >> *config;
 
         if (!yin.error()) {

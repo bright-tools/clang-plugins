@@ -1,6 +1,6 @@
 add_library(brighttools-clang-plugin-util STATIC
   ConfigBase.cpp
-  BanTokenConfig.cpp
+  BanStringConfig.cpp
 )
 
 set_property(TARGET brighttools-clang-plugin-util PROPERTY POSITION_INDEPENDENT_CODE ON)

@@ -1,0 +1,8 @@
+BannedIncludes:
+  - Filename: include_file_which_includes_another_include.h
+    Reason: It's a test
+  - Filename: include_file.h
+    WhiteListRegex: includes_banned_header_but_is_whitelisted\.c
+  - Filename: blacklisted.h
+    BlackListRegex: includes_banned_header_and_is_blacklisted\.c
+    Reason: Blacklisted
