@@ -1,3 +1,9 @@
+brighttools-clang-plugins (0.5.0) unstable; urgency=low
+
+  * Add ability to disallow include files to IncludePathChecker
+
+  -- John Bailey <dev@brightsilence.org>  Sun, 24 Oct 2021 19:00:00 +0000
+
 brighttools-clang-plugins (0.4.0) unstable; urgency=low
 
   * Add Blacklist configuration option
