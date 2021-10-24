@@ -34,8 +34,16 @@ add_test(NAME IncludePathChecker_ChildSystemHeaderAllowed
          COMMAND ${BATS_EXE} check_violation_is_not_detected_when_system_child_refs_allowed.bats
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/disallow_child_allow_system)
 
- add_test(NAME IncludePathChecker_BannedIncludes
+add_test(NAME IncludePathChecker_BannedIncludes
          COMMAND ${BATS_EXE} check_banned_includes.bats
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/banned_includes)
+
+add_test(NAME IncludePathChecker_Whitelisted
+         COMMAND ${BATS_EXE} check_whitelisted_includes.bats
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/banned_includes)
+
+add_test(NAME IncludePathChecker_Blacklisted
+         COMMAND ${BATS_EXE} check_blacklisted_includes.bats
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/banned_includes)
 
 set_tests_properties(IncludePathChecker_BannedIncludes
@@ -48,4 +56,6 @@ set_tests_properties(IncludePathChecker_BannedIncludes
                      IncludePathChecker_PositiveParent
                      IncludePathChecker_NotEnabled
                      IncludePathChecker_Negative
+                     IncludePathChecker_Whitelisted
+                     IncludePathChecker_Blacklisted
                      PROPERTIES ENVIRONMENT "${TEST_ENVIRONMENT};PLUGIN_TARGET=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/$<TARGET_FILE_NAME:include-path-checker-plugin-${CLANG_VERSION_MAJOR}>")

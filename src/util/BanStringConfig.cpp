@@ -55,24 +55,32 @@ llvm::Optional<BanStringConfig> BanStringConfig::readConfig(llvm::StringRef file
     return llvm::None;
 }
 
-bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason) {
+static bool stringsEqual(llvm::StringRef s1, const std::string& s2) {
+    return (s1 == s2);
+}
+
+bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason,
+    bool (*matcher)(llvm::StringRef, const std::string&)) {
+
     if (!isRegexCacheBuilt) {
         populateRegexCache();
     }
 
     for (auto bannedString = bannedStrings.begin(); bannedString != bannedStrings.end(); bannedString++) {
 
-        if (stringToCheck == bannedString->string) {
+        if (matcher(stringToCheck, bannedString->string)) {
 
             /* All files are blacklisted by default, unless the blacklist regex is specified
                in which case only files matched by that expression are blacklisted */
             bool isBlacklisted = true;
             if (bannedString->blacklistRegex) {
+                llvm::outs() << "BLCheck\n";
                 isBlacklisted = bannedString->blacklistRegex->match(fileName);
             }
 
             bool isWhitelisted = false;
             if (bannedString->whitelistRegex) {
+                llvm::outs() << "WLCheck\n" << fileName << "\n";
                 isWhitelisted = bannedString->whitelistRegex->match(fileName);
             }
 
@@ -85,6 +93,10 @@ bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const 
         }
     }
     return false;
+}
+
+bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason) {
+    return isStringBanned(stringToCheck, fileName, reason, stringsEqual);
 }
 
 } // namespace brighttools

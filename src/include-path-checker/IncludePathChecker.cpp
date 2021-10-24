@@ -69,8 +69,10 @@ class CheckIncludePath : public clang::PPCallbacks {
                 diagEngine.Report(HashLoc, foundRelativePathDiagId) << FileName.str();
             }
 
+            const llvm::StringRef importingFile = sm.getFilename(HashLoc);
+
             std::string reason;
-            if(config.bannedFiles.isStringBanned(FileName, File->getName().data(), &reason)) {
+            if(config.bannedFiles.isStringBanned(FileName, importingFile.str(), &reason, includeCompare)) {
                 if (reason.empty()) {
                     diagEngine.Report(HashLoc, bannedIncludeDiagId) << FileName.str();
                 } else {
@@ -95,6 +97,12 @@ class CheckIncludePath : public clang::PPCallbacks {
             clang::DiagnosticsEngine::Error, "Found use of banned include '%0'");
         bannedIncludeWithReasonDiagId = diagEngine.getCustomDiagID(
             clang::DiagnosticsEngine::Error, "Found use of banned include '%0', ban reason: %1");
+    }
+
+    static bool includeCompare(llvm::StringRef stringToCheck, const std::string& bannedString) {
+        return (stringToCheck == bannedString) ||
+               stringToCheck.endswith("/"+bannedString) ||
+               stringToCheck.endswith("\\"+bannedString);
     }
 };
 

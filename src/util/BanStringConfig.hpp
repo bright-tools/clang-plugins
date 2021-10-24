@@ -13,6 +13,8 @@ class BanStringConfig {
     static llvm::Optional<BanStringConfig> readConfig(llvm::StringRef file);
 
     bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason = NULL);
+    bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason,
+                        bool (*matcher)(const llvm::StringRef, const std::string&));
 
     std::vector<BannedString> bannedStrings;
    private:
