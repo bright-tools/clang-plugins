@@ -1,3 +1,10 @@
+brighttools-clang-plugins (0.6.0) unstable; urgency=low
+
+  * Add ability to specify ban string patterns as regular expressions
+  * Fix package generation such that packages based on different clang versions can be installed concurrently
+
+  -- John Bailey <dev@brightsilence.org>  Sun, 31 Oct 2021 12:00:00 +0000
+
 brighttools-clang-plugins (0.5.0) unstable; urgency=low
 
   * Add ability to disallow include files to IncludePathChecker
