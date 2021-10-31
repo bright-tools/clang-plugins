@@ -9,6 +9,7 @@ add_custom_command(
 )
 
 add_custom_target(changelog ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz")
+set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DOCDIR}-${CLANG_VERSION_MAJOR}")
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
     DESTINATION "${CMAKE_INSTALL_DOCDIR}"
