@@ -79,13 +79,14 @@ class PrintFunctionsConsumer : public clang::ASTConsumer {
         if (config->isStringBanned(token, fileName, &reason)) {
             clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
             if (reason.length()) {
-                const unsigned diagID =
-                    diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
-                                               "Found use of banned token '%0'.\nBan reason: %1");
+                const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
+                                                                  "Found use of banned token '%0'.\nBan reason: %1");
                 diagEngine.Report(location, diagID) << token << reason;
-            } else {
-                const unsigned diagID = diagEngine.getCustomDiagID(
-                    clang::DiagnosticsEngine::Error, "Found use of banned token '%0'.");
+            }
+            else
+            {
+                const unsigned diagID = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
+                                                                  "Found use of banned token '%0'.");
                 diagEngine.Report(location, diagID) << token;
             }
         }

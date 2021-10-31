@@ -16,10 +16,10 @@
 #include "IncludePathCheckerConfig.hpp"
 
 #include <clang/AST/AST.h>
-#include <clang/Basic/FileManager.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 #include <clang/Lex/PPCallbacks.h>
+#include <clang/Basic/FileManager.h>
 
 using namespace brighttools;
 
@@ -56,13 +56,11 @@ class CheckIncludePath : public clang::PPCallbacks {
                 shouldReportDiagnostic = (FileName.find("/") != clang::StringRef::npos) ||
                                          (FileName.find("\\") != clang::StringRef::npos);
 
-                const bool isSystemHeader =
-                    (clang::SrcMgr::CharacteristicKind::C_System == FileType) ||
-                    (clang::SrcMgr::CharacteristicKind::C_ExternCSystem == FileType);
+                const bool isSystemHeader = (clang::SrcMgr::CharacteristicKind::C_System == FileType) || (clang::SrcMgr::CharacteristicKind::C_ExternCSystem  == FileType);
 
-                if (isSystemHeader && config.allowChildDirSystemHeaderIncludeReferences) {
-                    shouldReportDiagnostic = false;
-                }
+                 if (isSystemHeader && config.allowChildDirSystemHeaderIncludeReferences) {
+                     shouldReportDiagnostic = false;
+                 }
             }
 
             clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
@@ -74,13 +72,11 @@ class CheckIncludePath : public clang::PPCallbacks {
             const llvm::StringRef importingFile = sm.getFilename(HashLoc);
 
             std::string reason;
-            if (config.bannedFiles.isStringBanned(FileName, importingFile.str(), &reason,
-                                                  includeCompare)) {
+            if(config.bannedFiles.isStringBanned(FileName, importingFile.str(), &reason, includeCompare)) {
                 if (reason.empty()) {
                     diagEngine.Report(HashLoc, bannedIncludeDiagId) << FileName.str();
                 } else {
-                    diagEngine.Report(HashLoc, bannedIncludeWithReasonDiagId)
-                        << FileName.str() << reason;
+                    diagEngine.Report(HashLoc, bannedIncludeWithReasonDiagId) << FileName.str() << reason;
                 }
             }
         }
@@ -97,15 +93,16 @@ class CheckIncludePath : public clang::PPCallbacks {
         clang::DiagnosticsEngine &diagEngine = CI.getDiagnostics();
         foundRelativePathDiagId = diagEngine.getCustomDiagID(
             clang::DiagnosticsEngine::Error, "Found use of relative path to include '%0'");
-        bannedIncludeDiagId = diagEngine.getCustomDiagID(clang::DiagnosticsEngine::Error,
-                                                         "Found use of banned include '%0'");
+        bannedIncludeDiagId = diagEngine.getCustomDiagID(
+            clang::DiagnosticsEngine::Error, "Found use of banned include '%0'");
         bannedIncludeWithReasonDiagId = diagEngine.getCustomDiagID(
             clang::DiagnosticsEngine::Error, "Found use of banned include '%0', ban reason: %1");
     }
 
-    static bool includeCompare(llvm::StringRef stringToCheck, const std::string &bannedString) {
-        return (stringToCheck == bannedString) || stringToCheck.endswith("/" + bannedString) ||
-               stringToCheck.endswith("\\" + bannedString);
+    static bool includeCompare(llvm::StringRef stringToCheck, const std::string& bannedString) {
+        return (stringToCheck == bannedString) ||
+               stringToCheck.endswith("/"+bannedString) ||
+               stringToCheck.endswith("\\"+bannedString);
     }
 };
 
@@ -134,6 +131,7 @@ class IncludePathCheckerAction : public clang::PluginASTAction {
     }
 
   private:
+
     void addPreProcessorHook(const clang::CompilerInstance &CI, IncludePathCheckerConfig config) {
         clang::Preprocessor &preprocessor = CI.getPreprocessor();
         preprocessor.addPPCallbacks(std::make_unique<CheckIncludePath>(CI, config));
