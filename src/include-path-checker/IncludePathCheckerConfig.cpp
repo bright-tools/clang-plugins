@@ -27,11 +27,14 @@ namespace yaml {
 
 template <> struct MappingTraits<brighttools::IncludePathCheckerConfig> {
     static void mapping(IO &io, brighttools::IncludePathCheckerConfig &info) {
-        brighttools::BannedStringContext *context = reinterpret_cast<brighttools::BannedStringContext *>(io.getContext());
+        brighttools::BannedStringContext *context =
+            reinterpret_cast<brighttools::BannedStringContext *>(io.getContext());
 
-        io.mapOptional("DisallowParentDirIncludeReferences", info.disallowParentDirIncludeReferences);
+        io.mapOptional("DisallowParentDirIncludeReferences",
+                       info.disallowParentDirIncludeReferences);
         io.mapOptional("DisallowChildDirIncludeReferences", info.disallowChildDirIncludeReferences);
-        io.mapOptional("AllowChildDirSystemHeaderIncludeReferences", info.allowChildDirSystemHeaderIncludeReferences);
+        io.mapOptional("AllowChildDirSystemHeaderIncludeReferences",
+                       info.allowChildDirSystemHeaderIncludeReferences);
         io.mapOptionalWithContext("BannedIncludes", info.bannedFiles.bannedStrings, *context);
     }
 };
@@ -41,7 +44,8 @@ template <> struct MappingTraits<brighttools::IncludePathCheckerConfig> {
 
 namespace brighttools {
 
-llvm::Optional<IncludePathCheckerConfig> IncludePathCheckerConfig::readConfig(llvm::StringRef file) {
+llvm::Optional<IncludePathCheckerConfig>
+IncludePathCheckerConfig::readConfig(llvm::StringRef file) {
     auto document = llvm::MemoryBuffer::getFile(file);
 
     if (!document.getError()) {

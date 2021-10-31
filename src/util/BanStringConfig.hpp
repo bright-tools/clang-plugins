@@ -12,12 +12,16 @@ class BanStringConfig {
   public:
     static llvm::Optional<BanStringConfig> readConfig(llvm::StringRef file);
 
-    bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason = NULL);
-    bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason,
-                        bool (*matcher)(const llvm::StringRef, const std::string&, std::shared_ptr<llvm::Regex>));
+    bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName,
+                        std::string *const reason = NULL);
+    bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName,
+                        std::string *const reason,
+                        bool (*matcher)(const llvm::StringRef, const std::string &,
+                                        std::shared_ptr<llvm::Regex>));
 
     std::vector<BannedString> bannedStrings;
-   private:
+
+  private:
     bool isRegexCacheBuilt = false;
     void populateRegexCache();
 };
@@ -34,7 +38,8 @@ namespace yaml {
 
 template <> struct MappingTraits<brighttools::BanStringConfig> {
     static void mapping(IO &io, brighttools::BanStringConfig &info) {
-        brighttools::BannedStringContext * const context = reinterpret_cast<brighttools::BannedStringContext *>(io.getContext());
+        brighttools::BannedStringContext *const context =
+            reinterpret_cast<brighttools::BannedStringContext *>(io.getContext());
         const std::string fieldName = "Banned" + std::string(context->stringAlias.data()) + "s";
         io.mapOptionalWithContext(fieldName.c_str(), info.bannedStrings, *context);
     }
