@@ -46,7 +46,17 @@ add_test(NAME IncludePathChecker_Blacklisted
          COMMAND ${BATS_EXE} check_blacklisted_includes.bats
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/banned_includes)
 
-set_tests_properties(IncludePathChecker_BannedIncludes
+ add_test(NAME IncludePathChecker_BannedRegexIncludes
+         COMMAND ${BATS_EXE} check_regex_banned_includes.bats
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/banned_regex_includes)
+
+add_test(NAME IncludePathChecker_NonBannedRegexIncludes
+         COMMAND ${BATS_EXE} check_regex_non_banned_includes.bats
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/banned_regex_includes)
+
+set_tests_properties(IncludePathChecker_NonBannedRegexIncludes
+                     IncludePathChecker_BannedRegexIncludes
+                     IncludePathChecker_BannedIncludes
                      IncludePathChecker_ChildSystemHeaderAllowed
                      IncludePathChecker_PositiveSystemChild
                      IncludePathChecker_SystemHeaderExclusion
