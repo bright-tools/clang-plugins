@@ -28,4 +28,12 @@ add_test(NAME BanPPTokens_BannedTokenInBlacklistedFileThatIsWhitelisted
          COMMAND ${BATS_EXE} no_error_if_banned_token_found_in_blacklisted_file_that_is_whitelisted.bats
          WORKING_DIRECTORY ${BAN_PP_TOKENS_HAS_CONFIG_TEST_DIR})
 
-set_tests_properties(BanPPTokens_BannedTokenInBlacklistedFileThatIsWhitelisted BanPPTokens_BannedTokenInUnBlacklistedFile BanPPTokens_BannedTokenInBlacklistedFile BanPPTokens_WhitelistedTokensUsedIndirectly BanPPTokens_WhitelistedTokens BanPPTokens_TokensPresentNotUsed BanPPTokens_TokensPresentUsedDirectly PROPERTIES ENVIRONMENT "${BAN_PP_TOKENS_TEST_ENVIRONMENT}")
+add_test(NAME BanPPTokens_BannedRegexTokens
+         COMMAND ${BATS_EXE} error_if_regex_banned_tokens_used.bats
+         WORKING_DIRECTORY ${BAN_PP_TOKENS_HAS_CONFIG_TEST_DIR})
+
+add_test(NAME BanPPTokens_NonBannedRegexTokens
+         COMMAND ${BATS_EXE} no_error_if_regex_banned_tokens_not_used.bats
+         WORKING_DIRECTORY ${BAN_PP_TOKENS_HAS_CONFIG_TEST_DIR})
+
+set_tests_properties(BanPPTokens_NonBannedRegexTokens BanPPTokens_BannedRegexTokens BanPPTokens_BannedTokenInBlacklistedFileThatIsWhitelisted BanPPTokens_BannedTokenInUnBlacklistedFile BanPPTokens_BannedTokenInBlacklistedFile BanPPTokens_WhitelistedTokensUsedIndirectly BanPPTokens_WhitelistedTokens BanPPTokens_TokensPresentNotUsed BanPPTokens_TokensPresentUsedDirectly PROPERTIES ENVIRONMENT "${BAN_PP_TOKENS_TEST_ENVIRONMENT}")

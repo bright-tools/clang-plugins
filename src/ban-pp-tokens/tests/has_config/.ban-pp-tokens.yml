@@ -10,3 +10,12 @@ BannedTokens:
     Reason: It's not going to help you
     WhiteListRegex: has_banned_token_is_blacklisted_and_whitelisted\.c
     BlackListRegex: (has_banned_token_and_is_blacklisted|has_banned_token_is_blacklisted_and_whitelisted)\.c
+  - Token: BLACKLISTED_REGEX_BUT_EXACT_MATCH$
+    EnableTokenRegex: true
+  - Token: NON_REGEX
+    EnableTokenRegex: false
+  - Token: ^REGEX_.*
+    EnableTokenRegex: true
+    Reason: Spurious reasoning
+  - Token: NO_START_NO_END
+    EnableTokenRegex: true

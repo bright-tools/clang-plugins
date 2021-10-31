@@ -26,6 +26,9 @@ void BanStringConfig::populateRegexCache() {
     for (std::vector<BannedString>::iterator it = bannedStrings.begin();
          it != bannedStrings.end();
          it++) {
+        if (it->enableRegex) {
+            it->stringRegex = std::shared_ptr<llvm::Regex>(new llvm::Regex(it->string));
+        }
         if (!(it->blacklistRegexString.empty())) {
             it->blacklistRegex = std::shared_ptr<llvm::Regex>(new llvm::Regex(it->blacklistRegexString));
         }
@@ -55,12 +58,16 @@ llvm::Optional<BanStringConfig> BanStringConfig::readConfig(llvm::StringRef file
     return llvm::None;
 }
 
-static bool stringsEqual(llvm::StringRef s1, const std::string& s2) {
-    return (s1 == s2);
+static bool stringsEqual(llvm::StringRef s1, const std::string& s2, std::shared_ptr<llvm::Regex> s2regEx) {
+    if (s2regEx) {
+        return s2regEx->match(s1);
+    } else {
+        return (s1 == s2);
+    }
 }
 
 bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason,
-    bool (*matcher)(llvm::StringRef, const std::string&)) {
+    bool (*matcher)(llvm::StringRef, const std::string&, std::shared_ptr<llvm::Regex>)) {
 
     if (!isRegexCacheBuilt) {
         populateRegexCache();
@@ -68,7 +75,7 @@ bool BanStringConfig::isStringBanned(const llvm::StringRef stringToCheck, const 
 
     for (auto bannedString = bannedStrings.begin(); bannedString != bannedStrings.end(); bannedString++) {
 
-        if (matcher(stringToCheck, bannedString->string)) {
+        if (matcher(stringToCheck, bannedString->string, bannedString->stringRegex)) {
 
             /* All files are blacklisted by default, unless the blacklist regex is specified
                in which case only files matched by that expression are blacklisted */
