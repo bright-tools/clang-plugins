@@ -27,6 +27,7 @@ DisallowParentDirIncludeReferences: false
 DisallowChildDirIncludeReferences: true
 BannedIncludes:
   - Filename: stdio.h
+    EnableFilenameRegex: false
     Reason: Don't use stdio.h directly, use one of the wrappers
     WhiteListRegex: io_wrappers/.*\.c
 ```
