@@ -99,10 +99,14 @@ class CheckIncludePath : public clang::PPCallbacks {
             clang::DiagnosticsEngine::Error, "Found use of banned include '%0', ban reason: %1");
     }
 
-    static bool includeCompare(llvm::StringRef stringToCheck, const std::string& bannedString) {
-        return (stringToCheck == bannedString) ||
-               stringToCheck.endswith("/"+bannedString) ||
-               stringToCheck.endswith("\\"+bannedString);
+    static bool includeCompare(llvm::StringRef stringToCheck, const std::string& bannedString, std::shared_ptr<llvm::Regex> bannedStringRegEx) {
+        if (bannedStringRegEx) {
+            return bannedStringRegEx->match(stringToCheck);
+        } else {
+            return (stringToCheck == bannedString) ||
+                   stringToCheck.endswith("/"+bannedString) ||
+                   stringToCheck.endswith("\\"+bannedString);
+        }
     }
 };
 

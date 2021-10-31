@@ -14,7 +14,7 @@ class BanStringConfig {
 
     bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason = NULL);
     bool isStringBanned(const llvm::StringRef stringToCheck, const std::string fileName, std::string* const reason,
-                        bool (*matcher)(const llvm::StringRef, const std::string&));
+                        bool (*matcher)(const llvm::StringRef, const std::string&, std::shared_ptr<llvm::Regex>));
 
     std::vector<BannedString> bannedStrings;
    private:
