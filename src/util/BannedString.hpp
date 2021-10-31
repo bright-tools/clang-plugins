@@ -7,11 +7,14 @@
 
 #include <string>
 #include <memory>
+#include <stdbool.h>
 
 namespace brighttools {
 
 typedef struct {
   std::string string;
+  std::shared_ptr<llvm::Regex> stringRegex;
+  bool enableRegex;
   std::string reason;
   std::string whitelistRegexString;
   std::shared_ptr<llvm::Regex> whitelistRegex;
@@ -36,6 +39,8 @@ template <> struct MappingContextTraits<brighttools::BannedString, brighttools::
         io.mapOptional("Reason", info.reason);
         io.mapOptional("WhiteListRegex", info.whitelistRegexString);
         io.mapOptional("BlackListRegex", info.blacklistRegexString);
+        const std::string enableRegexFieldName = std::string("Enable") + context.stringAlias.data() + "Regex";
+        io.mapOptional(enableRegexFieldName.c_str(), info.enableRegex);
     }
 };
 

@@ -1,0 +1,3 @@
+unsigned BLACKLISTED_REGEX_BUT_EXACT_MATCH1;
+unsigned _REGEX_1;
+unsigned NON_REGEX_1;

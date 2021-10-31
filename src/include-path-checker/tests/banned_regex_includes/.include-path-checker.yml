@@ -1,0 +1,11 @@
+BannedIncludes:
+  - Filename: std.*\.h$
+    EnableFilenameRegex: true
+    Reason: There is no reason
+  - Filename: string\.h
+    EnableFilenameRegex: true
+    Reason: Ropey
+  - Filename: include.*\.h
+    EnableFilenameRegex: true
+  - Filename: math
+    EnableFilenameRegex: false
